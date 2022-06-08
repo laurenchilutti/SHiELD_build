@@ -6,9 +6,8 @@ jobs:
     container:
       image: noaagfdl/ubuntu_libfms_gnu
     steps:
-      - name: Checkout SHiELD_build
-        uses: actions/checkout@v3
       - name: check things
         run: |
          ls -a
-         git submodule --init --recursive
+         which git
+         echo $PATH
