@@ -1,0 +1,12 @@
+name: SHiELD Test
+on: [push]
+jobs:
+  Build_SOLO:
+    runs-on: ubuntu-latest
+    container:
+      image: noaagfdl/ubuntu_libfms_gnu
+    steps:
+      - name: Checkout SHiELD_build
+        uses: actions/checkout@v3
+      - name: check things
+        run: ls -a
