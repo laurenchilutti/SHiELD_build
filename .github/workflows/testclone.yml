@@ -8,7 +8,4 @@ jobs:
     steps:
       - name: check things
         run: |
-         ls -a
-         which git
-         echo $PATH
-         ls /usr/bin/git
+         ls /usr/bin/git/
