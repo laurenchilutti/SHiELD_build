@@ -11,3 +11,5 @@ jobs:
          ls -a
          which git
          echo $PATH
+         cd /usr/bin/git
+         ls
