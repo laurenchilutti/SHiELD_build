@@ -8,5 +8,7 @@ jobs:
     steps:
       - name: Checkout SHiELD_build
         uses: actions/checkout@v3
+        with:
+          submodules: 'true'
       - name: check things
         run: ls -a
