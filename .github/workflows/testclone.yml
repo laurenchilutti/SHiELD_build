@@ -8,5 +8,6 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
+      - name: check things
+        run: |
+          ls -a
