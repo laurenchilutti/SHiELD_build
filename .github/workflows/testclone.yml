@@ -11,3 +11,5 @@ jobs:
       - name: check things
         run: |
           ls -a
+          cd mkmf/
+          ls -a
