@@ -167,7 +167,7 @@ sleep 5
      echo " pre-built libFMS/${compiler} exists"
   else
      echo " libFMS/${compiler} does not exist - building libFMS/${compiler}"
-     MAKE_libFMS ${compiler}  >> build_libFMS_${compiler}.out 2>&1   # build 32bit and 64bit versions of libFMS
+     MAKE_libFMS ${compiler}   # build 32bit and 64bit versions of libFMS
      #
      # test and report on libFMS build success
      if [ $? -ne 0 ] ; then
@@ -186,21 +186,21 @@ sleep 5
 echo -e "  building ${config} ${hydro} ${comp} ${bit} ${compiler} \t `date`"
   #
   # create the file list for the build
-    mk_paths ${config} ${compiler}                      > build_${config}_${hydro}.${comp}.${bit}.${compiler}.out 2>&1
+    mk_paths ${config} ${compiler}                      
     if [ $? -ne 0 ] ; then
        echo ">>> filelist cration failed"
        exit 3
     fi
   #
   # create the library makefiles
-    mk_makefile ${config} ${hydro} ${bit} ${compiler}  >> build_${config}_${hydro}.${comp}.${bit}.${compiler}.out 2>&1
+    mk_makefile ${config} ${hydro} ${bit} ${compiler}  
     if [ $? -ne 0 ] ; then
        echo ">>> makefile creation failed"
        exit 4
     fi
   #
   # build the configuration
-    mk_make ${config} ${comp} ${bit} ${avx} ${compiler}          >> build_${config}_${hydro}.${comp}.${bit}.${compiler}.out 2>&1
+    mk_make ${config} ${comp} ${bit} ${avx} ${compiler}          
   #
   # move the executable to an accessible area
     mv exec/${config}_${compiler}/test.x bin/${config_name}_${hydro}.${comp}.${bit}.${compiler}.x
