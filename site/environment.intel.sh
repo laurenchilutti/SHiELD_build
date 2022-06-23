@@ -160,6 +160,33 @@ elif [ `hostname | cut -c1-3` = "lsc" ] ; then
    echo -e ' '
    module list
 
+elif [ `hostname | cut -c1-4` = "mgmt" ] ; then
+   echo " parallelworks environment "
+
+   . ${MODULESHOME}/init/sh
+   module load intel/2022.1.2
+   module load impi/2022.1.2
+   module load netcdf
+   module load hdf5
+
+   export CPATH="${NETCDF}/include:${CPATH}"
+   export LIBRARY_PATH="${LIBRARY_PATH}:${NETCDF}/lib:${HDF5}/lib"
+   export NETCDF_DIR=${NETCDF}
+
+   # make your compiler selections here
+   export FC=mpiifort
+   export CC=mpiicc
+   export CXX=mpicpc
+   export LD=mpiifort
+   export TEMPLATE=site/intel.mk
+   export LAUNCHER=srun
+
+   # highest level of AVX support
+   export AVX_LEVEL=-xSKYLAKE-AVX512
+
+   echo -e ' '
+   module list
+
 else
 
    echo " no environment available based on the hostname "

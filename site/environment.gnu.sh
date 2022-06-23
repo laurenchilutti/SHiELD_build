@@ -155,6 +155,31 @@ elif [ `hostname | cut -c1-3` = "lsc" ] ; then
    echo -e ' '
    module list
 
+elif [ `hostname | cut -c1-4` = "mgmt" ] ; then
+   echo " parallelworks environment "
+
+   source $MODULESHOME/init/sh
+   module load gcc/9.2.0
+   module load impi/2020
+   module load netcdf
+   module load hdf5
+
+   export NETCDF_DIR=${NETCDF}
+
+   # make your compiler selections here
+   export FC=mpif90
+   export CC=mpicc
+   export CXX=mpicxx
+   export LD=mpif90
+   export TEMPLATE=site/gnu.mk
+   export LAUNCHER=srun
+
+   # highest level of AVX support
+   export AVX_LEVEL=-xSKYLAKE-AVX512
+
+   echo -e ' '
+   module list
+
 else
 
    echo " no environment available based on the hostname "
