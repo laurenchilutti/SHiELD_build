@@ -181,6 +181,7 @@ elif [ `hostname | cut -c1-4` = "mgmt" ] ; then
    export TEMPLATE=site/intel.mk
    export LAUNCHER=srun
    export AVX_LEVEL=-xhost
+   export CI=--mpi=pmi2
 
    echo -e ' '
    module list

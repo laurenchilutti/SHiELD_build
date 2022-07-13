@@ -48,6 +48,7 @@ fi
 
 # configure the site
 COMPILER=${COMPILER:-intel}
+CI=""
 . ${BUILDDIR}/site/environment.${COMPILER}.sh
 
 set -x
@@ -183,10 +184,10 @@ npes=`expr ${layout_x} \* ${layout_y}`
 LAUNCHER=${LAUNCHER:-srun}
 if [ ${LAUNCHER} = 'srun' ] ; then
     export SLURM_CPU_BIND=verbose
-    run_cmd="${LAUNCHER} --label --ntasks=$npes --cpus-per-task=$skip $CONTAINER ./${executable##*/}"
+    run_cmd="${LAUNCHER} --label --ntasks=$npes --cpus-per-task=$skip $CI $CONTAINER ./${executable##*/}"
 else
     export MPICH_ENV_DISPLAY=YES
-    run_cmd="${LAUNCHER} -prepend-rank -np $npes $CONTAINER ./${executable##*/}"
+    run_cmd="${LAUNCHER} -prepend-rank -np $npes $CI $CONTAINER ./${executable##*/}"
 fi
 
 # set up the run area
