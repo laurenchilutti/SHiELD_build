@@ -180,9 +180,7 @@ elif [ `hostname | cut -c1-4` = "mgmt" ] ; then
    export LD=mpiifort
    export TEMPLATE=site/intel.mk
    export LAUNCHER=srun
-
-   # highest level of AVX support
-   export AVX_LEVEL=-xSKYLAKE-AVX512
+   export AVX_LEVEL=-xhost
 
    echo -e ' '
    module list
