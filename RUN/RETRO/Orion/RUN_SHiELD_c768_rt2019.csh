@@ -1,37 +1,42 @@
 #!/bin/tcsh
-#SBATCH --output=./stdout/%x.%j
-#SBATCH --job-name=C768
-#SBATCH --account=gfdl_f
-#SBATCH --clusters=c3
-#SBATCH --time=00:20:00
-#SBATCH --nodes=61
+#SBATCH --output=/home/ysun/stdout/%x.2t_ht.o%j
+#SBATCH --job-name=SHiELD_C768
+#SBATCH -A gfdlhires
+#SBATCH --partition=orion
+#SBATCH --time=02:00:00
+#SBATCH --nodes=77
+#SBATCH --exclusive
 
 source ${MODULESHOME}/init/tcsh
 module load intel/2020
-module load netcdf/
-module load hdf5/
+module load netcdf/4.7.2-parallel
+module load hdf5/1.10.5-parallel
 module load impi/2020
+
+
 
 set echo
 
-set WORKDIR = "${SCRATCH}/${USER}/"
+set WORKDIR = "/work/noaa/gfdlscr/${USER}/"
 
 set BASEDIR    = "$WORKDIR"
-set INPUT_DATA = "/lustre/f2/pdata/gfdl/gfdl_W/fvGFS_INPUT_DATA"
+set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
 # from YQS
-set BUILD_AREA = "${DEV}/${USER}/SHiELD_github/SHiELD_build/"
+set BUILD_AREA = "~${USER}/SHiELD/Rusty/SHiELD_build/"
+
+
 
 # release number for the script
-source fms.csh
-set RELEASE = "SHiELD_${COMPILER}_${DESCRIPTOR}_${BIT}"
+#set RELEASE = "`cat ${BUILD_AREA}/release`"
+set RELEASE = "SHiELD_FMS2020.02"
 
 # case specific details
 set TYPE = "nh"         # choices:  nh, hydro
-set MODE = "${BIT}"      # choices:  32bit, 64bit
+set MODE = "32bit"      # choices:  32bit, 64bit
 set MONO = "non-mono"   # choices:  mono, non-mono
 set CASE = "C768"
 set NAME = "20160801.00Z"
-set MEMO = "$SLURM_JOB_NAME"
+set MEMO = "_RT2019"
 set EXE = "x"
 set HYPT = "on"         # choices:  on, off  (controls hyperthreading)
 set COMP = "repro"       # choices:  debug, repro, prod
@@ -39,8 +44,8 @@ set NO_SEND = "no_send"  # choices:  send, no_send  # send option not available 
 
 set CPN = 40
 # directory structure
-set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}.${MEMO}/
-set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${DESCRIPTOR}.${EXE}
+set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
+set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${EXE}
 
 # input filesets
 set ICS  = ${INPUT_DATA}/global.v201810/${CASE}/${NAME}_IC/GFS_INPUT.tar
@@ -51,28 +56,27 @@ set FIX_bqx  = ${INPUT_DATA}/climo_data.v201807
 
 
 # sending file to gfdl
-set gfdl_archive = /archive/${USER}/SHiELD_S2S/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
-set SEND_FILE = /home/${USER}/Util/send_file_slurm.csh
-set TIME_STAMP = /home/${USER}/Util/time_stamp.csh
+set gfdl_archive = /archive/${USER}/NGGPS/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
+set SEND_FILE =  /autofs/mnt/ncrc-svm1_home1/Jan-Huey.Chen/Util/send_file_c3.csh
+set TIME_STAMP = /autofs/mnt/ncrc-svm1_home1/Jan-Huey.Chen/Util/time_stamp.csh
 
 # changeable parameters
     # dycore definitions
     set npx = "769"
     set npy = "769"
     set npz = "91"
-    set layout_x = "18" 
-    set layout_y = "18" 
+    set layout_x = "16" 
+    set layout_y = "32" 
     set io_layout = "1,1"
     set nthreads = "2"
 
     # blocking factor used for threading and general physics performance
-    set blocksize = "33"
+    set blocksize = "32"
 
     # run length
     set months = "0"
-    set days = "0"
-    set hours = "1"
-    set seconds = "300"
+    set days = "2"
+    set hours = "0"
     set dt_atmos = "150"
 
     # set the pre-conditioning of the solution
@@ -90,7 +94,7 @@ set TIME_STAMP = /home/${USER}/Util/time_stamp.csh
 #    set fdiag = "6.,12.,18.,24.,30.,36.,42.,48.,54.,60.,66.,72.,78.,84.,90.,96.,102.,108.,114.,120.,126.,132.,138.,144.,150.,156.,162.,168.,174.,180.,186.,192.,198.,204.,210.,216.,222.,228.,234.,240."
     set fdiag = "6."
     set fhzer = "6."
-    set fhcyc = "0."
+    set fhcyc = "24."
 
     # determines whether FV3 or GFS physics calculate geopotential
     set gfs_phil = ".false."
@@ -155,6 +159,11 @@ set TIME_STAMP = /home/${USER}/Util/time_stamp.csh
     @ skip = ${nthreads} / ${div}
     set run_cmd = "srun --ntasks=$npes --cpus-per-task=$skip ./$executable:t"
 
+
+
+
+
+
     setenv MPICH_ENV_DISPLAY
     setenv MPICH_MPIIO_CB_ALIGN 2
     setenv MALLOC_MMAP_MAX_ 0
@@ -184,11 +193,10 @@ cat > diag_table << EOF
 ${NAME}.${CASE}.${MODE}.${MONO}
 $y $m $d $h 0 0 
 EOF
-#cat ${BUILD_AREA}/RUN/RETRO/diag_table_no3d >> diag_table
+cat ${BUILD_AREA}/RUN/RETRO/diag_table_no3d >> diag_table
 
 # copy over the other tables and executable
 cp ${BUILD_AREA}/RUN/RETRO/data_table data_table
-cp ${BUILD_AREA}/RUN/RETRO/diag_table_hwt_test diag_table
 cp ${BUILD_AREA}/RUN/RETRO/field_table_6species field_table
 cp $executable .
 
@@ -231,18 +239,10 @@ cat > input.nml <<EOF
        max_files_w = 100,
 /
 
-# &fms2_io_nml
-#       ncchksz = 1048576
-#/
-
  &fms_nml
        clock_grain = 'ROUTINE',
        domains_stack_size = 3000000,
        print_memory_usage = .false.
-/
-
- &fms_affinity_nml
-      affinity=.false.
 /
 
  &fv_grid_nml
@@ -325,7 +325,7 @@ cat > input.nml <<EOF
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       !memuse_verbose = .false.
+       memuse_verbose = .false.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -381,7 +381,7 @@ cat > input.nml <<EOF
        xkzm_h         = 0.001
        cloud_gfdl     = .true.
        do_inline_mp   = .true.
-       do_ocean       = .false.
+       do_ocean       = .true.
 /
 
  &ocean_nml
@@ -476,7 +476,7 @@ cat > input.nml <<EOF
        qi_lim = 1.
        prog_ccn = .false.
        do_qa = .true.
-       !fast_sat_adj = .false.
+       fast_sat_adj = .false.
        tau_l2v = 300.
        tau_l2v = 225.
        tau_v2l = 150.
@@ -503,12 +503,9 @@ cat > input.nml <<EOF
        mono_prof = .true.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       !de_ice = .false.
+       de_ice = .false.
        fix_negative = .true.
        icloud_f = 0
-/
-
- &cld_eff_rad_nml
 /
 
  &cloud_diagnosis_nml

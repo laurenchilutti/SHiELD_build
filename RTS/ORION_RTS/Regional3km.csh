@@ -1,13 +1,10 @@
 #!/bin/tcsh
-#SBATCH --output=/home/jmoualle/ORION_RT/stdout/%x.%j
+#SBATCH --output=./stdout/%x.%j
 #SBATCH --job-name=Regional3km
-#SBATCH -A gfdlhires
-#SBATCH --partition=orion
-#SBATCH --time=00:20:00
-#SBATCH --nodes=24
-#SBATCH --exclusive
-#SBATCH --mail-user=joseph.mouallem@noaa.gov
-#SBATCH --mail-type=ALL
+#SBATCH --account=gfdl_f
+#SBATCH --clusters=c3
+#SBATCH --time=00:30:00
+#SBATCH --nodes=29
 
 source ${MODULESHOME}/init/tcsh
 module load intel/2020
@@ -17,22 +14,23 @@ module load impi/2020
 
 set echo
 
-set WORKDIR = "/work/noaa/gfdlscr/${USER}/"
+set WORKDIR = "${SCRATCH}/${USER}/"
 
 set BASEDIR    = "$WORKDIR"
-set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/SHiELD_IC/Alaska_c3072/"
+set INPUT_DATA = "/lustre/f2/dev/Lauren.Chilutti/Alaska_c3072"
 # from YQS
-set BUILD_AREA = "~${USER}/SHiELD_Lucas/SHiELD_build/"
+set BUILD_AREA = "${DEV}/${USER}/SHiELD_github/SHiELD_build/"
 
 #set hires_oro_factor = 12
 set res = 3072
 
 # release number for the script
-set RELEASE = "`cat ${BUILD_AREA}/release`"
+source fms.csh 
+set RELEASE = "SHiELD_${COMPILER}_${DESCRIPTOR}_${BIT}"
 
 # case specific details
 set TYPE = "nh"          # choices:  nh, hydro
-set MODE = "32bit"      # choices:  32bit, 64bit
+set MODE = "${BIT}"      # choices:  32bit, 64bit
 set CASE = "C${res}_alaska"
 set MONO = "non-mono"
 set NAME = "20170114.00Z"
@@ -43,12 +41,12 @@ set NO_SEND = "send"  # choices:  send, no_send
 set EXE = "x"
 # directory structure
 set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
-set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${EXE}
+set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${DESCRIPTOR}.${EXE}
 
 # input filesets
 set ICS  = ${INPUT_DATA}/${NAME}_IC/
-set FIX  = /work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/fix.v201810
-set GFS  = /work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/GFS_STD_INPUT.20160311.tar
+set FIX  = /lustre/f2/pdata/gfdl/gfdl_W/fvGFS_INPUT_DATA/fix.v201810
+set GFS  = /lustre/f2/pdata/gfdl/gfdl_W/fvGFS_INPUT_DATA/GFS_STD_INPUT.20160311.tar
 set GRID = ${INPUT_DATA}/GRID/
 
 # sending file to gfdl
@@ -102,7 +100,7 @@ set TIME_STAMP = /home/${USER}/Util/time_stamp.csh
 
 
     # set various debug options
-    set no_dycore = ".F."
+    set no_dycore = ".T."
     set dycore_only = ".F." # debug
     set chksum_debug = ".false."
     set print_freq = "10" # debug
@@ -271,6 +269,11 @@ else
    else
     ln -s $restart_file/* INPUT/.
    endif
+  
+   foreach out1 (`ls *_table`)
+     set split = ($out1:as/./ /)
+     mv $out1 $split[2]
+   end
 
    # reset values in input.nml for restart run
    set make_nh = ".F."
@@ -324,6 +327,10 @@ cat >! input.nml <<EOF
        print_memory_usage = .F.
 /
 
+ &fms_affinity_nml
+      affinity=.false.
+/
+
  &fv_grid_nml
        grid_file = 'INPUT/grid_spec.nc' ! This line is IMPORTANT for regional model
 /
@@ -359,7 +366,7 @@ cat >! input.nml <<EOF
        k_split  = $k_split
        n_split  = $n_split
        nwat = 6 
-       na_init = 1
+       na_init =$na_init 
        d_ext = 0.0
        dnats = 2 ! 2019: improved efficiency by not advecting o3
        fv_sg_adj = 1800 ! 2019: full-domain weak 2dz damping
@@ -370,10 +377,10 @@ cat >! input.nml <<EOF
        d4_bg = 0.14
        vtdm4 = 0.02
        do_vort_damp = .T.
-       external_ic = .T.
-       nggps_ic = .T.
+       external_ic = $external_ic
+       nggps_ic = $nggps_ic 
        hrrrv3_ic= .F.
-       mountain = .F.
+       mountain = $mountain 
        ncep_ic = .F.
        d_con = 1.0 ! 2019: Full-strength dissipative heating
        hord_mt = 6
@@ -388,7 +395,7 @@ cat >! input.nml <<EOF
        consv_am = .F.
        dwind_2d = .F.
        print_freq = $print_freq
-       warm_start = .F.
+       warm_start = $warm_start
        no_dycore = $no_dycore
 
        rf_fast = .F.
@@ -414,7 +421,7 @@ cat >! input.nml <<EOF
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .T.
+       !memuse_verbose = .T.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -472,7 +479,6 @@ cat >! input.nml <<EOF
        do_deep        = .false.
        do_ocean       = .true. ! 2019: Using an hfvGFS-like setting
        ysupbl         = .true. ! 201907h6: restored YSU
-       satmedmf       = .false.
        do_inline_mp   = .true.
        xkzminv        = 0.0  ! 2019: NO diffusion in inversion layers
        xkzm_h         = 0.2  ! 2019: YSU default (note divided by 2 inside scheme)
@@ -574,7 +580,7 @@ mp_time = $dt_atmos
        qi_lim = 2.
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .F.
+       !fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  22.5 ! 201907d: short timescale introduced
        tau_g2v = 900. ! 2019: increased
@@ -598,13 +604,17 @@ mp_time = $dt_atmos
        use_ccn = .true.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
+       !de_ice = .false.
        fix_negative = .true.
        icloud_f = 0     ! 2019: enabled
        do_hail = .true. ! 2019: enabled
        do_cond_timescale = .true. ! 201984zb
 
 /
+
+  &cld_eff_rad_nml
+/
+
 
 
  &cloud_diagnosis_nml

@@ -1,13 +1,11 @@
 #!/bin/tcsh
-#SBATCH --output=/home/jmoualle/ORION_RT/stdout/%x.%j
+#SBATCH --output=./stdout/%x.%j
 #SBATCH --job-name=C768r15n3
-#SBATCH -A gfdlhires
-#SBATCH --partition=orion
+#SBATCH --account=gfdl_f
+#SBATCH --clusters=c3
 #SBATCH --time=00:20:00
-#SBATCH --nodes=74
-#SBATCH --exclusive
-#SBATCH --mail-user=joseph.mouallem@noaa.gov
-#SBATCH --mail-type=ALL
+#SBATCH --nodes=93
+#SBATCH --qos=DEBUG
 
 source ${MODULESHOME}/init/tcsh
 module load intel/2020
@@ -16,20 +14,22 @@ module load hdf5/
 module load impi/2020
 set echo
 
-set WORKDIR = "/work/noaa/gfdlscr/${USER}/"
+set WORKDIR = "${SCRATCH}/${USER}/"
 
 set BASEDIR    = "$WORKDIR"
-set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
-set INPUT_DATA1 = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA1/"
+set INPUT_DATA = "/lustre/f2/pdata/gfdl/gfdl_W/fvGFS_INPUT_DATA"
 # from YQS
-set BUILD_AREA = "/home/${USER}/SHiELD_Lucas/SHiELD_build/"
+set BUILD_AREA = "${DEV}/${USER}/SHiELD_github/SHiELD_build/"
 
 # release number for the script
-set RELEASE = "SHiELD_FMS2020.02"
+set RELEASE = "SHiELD"
+source fms.csh
+set RELEASE = "SHiELD_${COMPILER}_${DESCRIPTOR}_${BIT}"
+
 
 # case specific details
 set TYPE = "nh"         # choices:  nh, hydro
-set MODE = "32bit"      # choices:  32bit, 64bit
+set MODE = "${BIT}"      # choices:  32bit, 64bit
 set MONO = "non-mono"   # choices:  mono, non-mono
 set CASE = "C768r15n3_hwt"
 set NAME = "20170501.00Z"
@@ -40,19 +40,19 @@ set NO_SEND = "no_send"    # choices:  send, no_send
 set EXE = "x"
 # directory structure
 set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
-set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${EXE}
+set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${DESCRIPTOR}.${EXE}
 
 # input filesets
-set ICS  = ${INPUT_DATA1}/variable.v201810/${CASE}/${NAME}_IC/GFS_INPUT.tar
+set ICS  = ${INPUT_DATA}/variable.v201810/${CASE}/${NAME}_IC/GFS_INPUT.tar
 set FIX  = ${INPUT_DATA}/fix.v201810/
 set GFS  = ${INPUT_DATA}/GFS_STD_INPUT.20160311.tar
-set GRID = ${INPUT_DATA1}/variable.v201810/${CASE}/GRID/
+set GRID = ${INPUT_DATA}/variable.v201810/${CASE}/GRID/
 set FIX_bqx  = ${INPUT_DATA}/climo_data.v201807
 
 # sending file to gfdl
 set gfdl_archive = /archive/${USER}/SHiELD_S2S/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
-set SEND_FILE = /home/${USER}/Util/send_file_slurm.csh
-set TIME_STAMP = /home/${USER}/Util/time_stamp.csh
+set SEND_FILE = /ncrc/home1/${USER}/Util/send_file_slurm.csh
+set TIME_STAMP = /ncrc/home1/${USER}/Util/time_stamp.csh
 
 # changeable parameters
     # dycore definitions
@@ -111,7 +111,7 @@ set TIME_STAMP = /home/${USER}/Util/time_stamp.csh
     # set various debug options
     set no_dycore = ".F."
     set dycore_only = ".F." 
-    set chksum_debug = ".false."
+    set chksum_debug = ".true."
     set print_freq = "-6"
 
     if (${TYPE} == "nh") then
@@ -187,7 +187,7 @@ set TIME_STAMP = /home/${USER}/Util/time_stamp.csh
     @ npes_g1 = ${layout_x} * ${layout_y} * 6
     @ npes_g2 = ${layout_x_g2} * ${layout_y_g2} 
     @ npes = ${npes_g1} + ${npes_g2}
-    set run_cmd = "srun --ntasks=$npes --cpus-per-task=$skip ./$executable:t"
+    set run_cmd = "srun --label --ntasks=$npes --cpus-per-task=$skip ./$executable:t"
 
     setenv MPICH_ENV_DISPLAY
     setenv MPICH_MPIIO_CB_ALIGN 2
@@ -289,6 +289,10 @@ flush_nc_files = .true.
        print_memory_usage = .F.
 /
 
+ &fms_affinity_nml
+      affinity=.false.
+/
+
  &fv_grid_nml
        !grid_file = 'INPUT/grid_spec.nc'
 /
@@ -368,7 +372,8 @@ flush_nc_files = .true.
 
 &fv_nest_nml
     grid_pes = $npes_g1,$npes_g2
-    grid_coarse = 0,1
+    !grid_coarse = 0,1
+    num_tile_top = 6
     tile_coarse = 0,6
     nest_refine = 0,3
     nest_ioffsets = 999,49
@@ -386,7 +391,7 @@ flush_nc_files = .true.
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .false.
+       !memuse_verbose = .false.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -426,7 +431,6 @@ flush_nc_files = .true.
        cal_pre        = .true.
        redrag         = .true.
        dspheat        = .true.
-       satmedmf       = .false.
        ysupbl         = .false.
        hybedmf        = .true.
        random_clds    = .true.
@@ -506,6 +510,12 @@ flush_nc_files = .true.
        fix_negative = .true.
        mp_time = 90.
        icloud_f = 1
+/
+
+  &gfdl_mp_nml
+/
+
+  &cld_eff_rad_nml
 /
 
   &interpolator_nml
@@ -798,6 +808,11 @@ flush_nc_files = .true.
        mp_time = $dt_atmos
 /
 
+  &gfdl_mp_nml
+/
+
+  &cld_eff_rad_nml
+/
 
   &interpolator_nml
        interp_method = 'conserve_great_circle'
