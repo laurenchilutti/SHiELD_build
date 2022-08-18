@@ -35,6 +35,7 @@ if [ `hostname | cut -c1-4` = "gaea" ] || [ `hostname | cut -c1-3` = "nid" ] ; t
    module load gcc/9.2.0
    module load cray-netcdf
    module load craype-hugepages4M
+   module load libyaml/0.2.5
 
    # make your compiler selections here
    export FC=ftn
@@ -56,6 +57,7 @@ elif [ `hostname | cut -c1-5` = "Orion" ] ; then
    module load impi/2021.2
    module load netcdf
    module load hdf5
+   module load libyaml/0.2.5
 
    export CPATH="${NETCDF}/include:${CPATH}"
    export HDF5=${HDF5_ROOT}
@@ -83,6 +85,7 @@ elif [ `hostname | cut -c1-2` = "fe" ] || [ `hostname | cut -c1` = "x" ] ; then
    module load impi/2020
    module load hdf5/1.10.5
    module load netcdf4/4.7.2
+   module load libyaml/0.2.5
 
    export LIBRARY_PATH="${LIBRARY_PATH}:${NETCDF4}/lib:${HDF5}/lib"
    export NETCDF_DIR=${NETCDF4}
@@ -103,6 +106,7 @@ elif [ `hostname | cut -c1` = "h" ] ; then
    module load impi/2020
    module load netcdf/4.7.2
    module load hdf5/1.10.5
+   module load libyaml/0.2.5
 
    export LIBRARY_PATH="${LIBRARY_PATH}:${NETCDF}/lib:${HDF5}/lib"
    export NETCDF_DIR=${NETCDF}
@@ -126,6 +130,7 @@ elif [ `hostname | cut -c1-3` = "lsc" ] ; then
    module load impi/2020
    module load netcdf/4.8.0
    module load hdf5/1.12.0
+   module load libyaml/0.2.5
 
    export CPATH="${NETCDF_ROOT}/include:${CPATH}"
    export NETCDF_DIR=${NETCDF_ROOT}

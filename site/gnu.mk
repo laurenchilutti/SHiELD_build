@@ -34,7 +34,9 @@ INCLUDE = "`nf-config --fflags` `nc-config --cflags`"
 else
 INCLUDE = -I$(NETCDF_ROOT)/include
 endif
+INCLUDE := $(shell pkg-config --cflags yaml-0.1)
 FPPFLAGS := -cpp -Wp,-w $(INCLUDE)
+CPPFLAGS := $(shell pkg-config --cflags yaml-0.1)
 
 FFLAGS := $(INCLUDE) -fcray-pointer -ffree-line-length-none -fno-range-check -fbacktrace
 
@@ -113,7 +115,7 @@ endif
 # NetCDF libraries
 LIBS += -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz
 
-LIBS +=
+LIBS := $(shell pkg-config --libs yaml-0.1)
 LDFLAGS += $(LIBS) -L$(NETCDF_ROOT)/lib -L$(HDF5_DIR)/lib
 
 #---------------------------------------------------------------------------
