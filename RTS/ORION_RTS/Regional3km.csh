@@ -212,6 +212,8 @@ cat ${BUILD_AREA}/FV3GFS/RUN/RETRO/diag_table_hwt_simple >> diag_table
 # copy over the other tables and executable
 cp ${BUILD_AREA}/RUN/RETRO/data_table data_table
 cp ${BUILD_AREA}/RUN/RETRO/field_table_6species field_table
+python3 ${BUILD_AREA}/fms_yaml_tools/data_table/data_table_to_yaml.py -f data_table
+python3 ${BUILD_AREA}/fms_yaml_tools/field_table/field_to_yaml.py field_table
 cp $executable .
 
 # GFS standard input data

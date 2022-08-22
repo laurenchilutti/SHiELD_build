@@ -225,6 +225,8 @@ EOF
 cp ${BUILD_AREA}/RUN/RETRO/data_table data_table
 cp ${BUILD_AREA}/RUN/RETRO/diag_table_hwt_test diag_table
 cp ${BUILD_AREA}/RUN/RETRO/field_table_6species field_table
+python3 ${BUILD_AREA}/fms_yaml_tools/data_table/data_table_to_yaml.py -f data_table
+python3 ${BUILD_AREA}/fms_yaml_tools/field_table/field_to_yaml.py field_table
 cp $executable .
 
 mkdir -p INPUT/
