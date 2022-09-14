@@ -28,13 +28,15 @@ if [ `hostname | cut -c1-4` = "gaea" ] || [ `hostname | cut -c1-3` = "nid" ] ; t
    echo " gaea environment "
 
    . ${MODULESHOME}/init/sh
-   module unload PrgEnv-pgi
+   module unload PrgEnv-pgi PrgEnv-intel PrgEnv-gnu
    module load   PrgEnv-intel
    module rm intel
+   module rm gcc
    module load intel/19.0.5.281
    module load cray-netcdf
    module load craype-hugepages4M
    module load libyaml/0.2.5
+   module load cmake/3.20.1
 
    # make your compiler selections here
    export FC=ftn
@@ -59,6 +61,7 @@ elif [ `hostname | cut -c1-5` = "Orion" ] ; then
    module load netcdf
    module load hdf5
    module load libyaml/0.2.5
+   module load cmake/3.22.1
 
    export CPATH="${NETCDF}/include:${CPATH}"
    export HDF5=${HDF5_ROOT}
@@ -92,6 +95,7 @@ elif [ `hostname | cut -c1-2` = "fe" ] || [ `hostname | cut -c1` = "x" ] ; then
    module load netcdf4/4.2.1.1
    module load mvapich2/2.1
    module load libyaml/0.2.5
+   module load cmake/3.20.1
 
    export LIBRARY_PATH="${LIBRARY_PATH}:${NETCDF4}/lib:${HDF5}/lib"
    export NETCDF_DIR=${NETCDF4}
@@ -115,6 +119,7 @@ elif [ `hostname | cut -c1` = "h" ] ; then
    module load netcdf/4.3.0
    module load hdf5/1.8.14
    module load libyaml/0.2.5
+   module load cmake/3.20.1
 
    export LIBRARY_PATH="${LIBRARY_PATH}:${NETCDF}/lib:${HDF5}/lib"
    export NETCDF_DIR=${NETCDF}
@@ -143,6 +148,7 @@ elif [ `hostname | cut -c1-3` = "lsc" ] ; then
    module load netcdf/4.8.0
    module load hdf5/1.12.0
    module load libyaml/0.2.5
+   module load cmake/3.18.2
 
    export CPATH="${NETCDF_ROOT}/include:${CPATH}"
    export NETCDF_DIR=${NETCDF_ROOT}
