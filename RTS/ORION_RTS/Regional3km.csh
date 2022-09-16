@@ -11,7 +11,8 @@ module load intel/2020
 module load netcdf/
 module load hdf5/
 module load impi/2020
-
+module load libyaml/0.2.5
+module load python/3.9
 set echo
 
 set WORKDIR = "${SCRATCH}/${USER}/"

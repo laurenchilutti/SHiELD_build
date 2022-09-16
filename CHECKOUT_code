@@ -35,7 +35,7 @@ release="main"
 
 fv3_release=$release
 phy_release=$release
-fms_release="2022.04-alpha1"
+fms_release="2022.04-alpha4"
 drivers_release="2022.02"
 
 git clone -b ${fv3_release}   https://github.com/NOAA-GFDL/GFDL_atmos_cubed_sphere

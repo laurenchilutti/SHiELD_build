@@ -1,7 +1,7 @@
 #!/bin/sh
 
-sbatch upC768r15n3.csh
-sbatch upC768.csh
-sbatch upC48n4.csh
-sbatch upC48_res.csh
-sbatch upRegional3km.csh
+sbatch C768r15n3.csh
+sbatch C768.csh
+sbatch C48n4.csh
+sbatch C48_res.csh
+sbatch Regional3km.csh
