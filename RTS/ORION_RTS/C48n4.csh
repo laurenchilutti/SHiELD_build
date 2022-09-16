@@ -14,16 +14,19 @@ module load intel/2020
 module load netcdf/
 module load hdf5/
 module load impi/2020
+module load libyaml/0.2.5
+module load python/3.9
 
 set echo
 
+#  update BASEDIR INPUT_DATA and BUILD_AREA to match your environment
 set BASEDIR    = "/work/noaa/gfdlscr/${USER}/"
 set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
 # from YQS
 set BUILD_AREA = "~${USER}/SHiELD_Lucas/SHiELD_build/"
 
 # release number for the script
-set RELEASE = "SHiELD_FMS2020.02"
+set RELEASE = "SHiELD_FMS2022.03"
 
 #set hires_oro_factor = 3
 set res = 48
@@ -214,6 +217,8 @@ mkdir -p RESTART
 cp ${BUILD_AREA}/RUN/RETRO/data_table data_table
 cp ${BUILD_AREA}/RUN/RETRO/diag_table_no3d diag_table
 cp ${BUILD_AREA}/RUN/RETRO/field_table_6species field_table
+python3 ${BUILD_AREA}/fms_yaml_tools/data_table/data_table_to_yaml.py -f data_table
+python3 ${BUILD_AREA}/fms_yaml_tools/field_table/field_to_yaml.py field_table
 cp $executable .
 
 
@@ -249,7 +254,7 @@ ln -sf ${ICS}/* INPUT/
 
 #Nested grid fix for new files
 foreach i ( $PWD/INPUT/*.tile7.nc )
-    ln -s $i ${i:r:r}.nest02.tile7.nc
+    mv $i ${i:r:r}.nest02.tile7.nc
 end
 
 cp $FIX/global_sfc_emissivity_idx.txt INPUT/sfc_emissivity_idx.txt
@@ -295,6 +300,24 @@ cp INPUT/sfc_emissivity_idx.txt .
 cp INPUT/solarconstant_noaa_an.txt .
 
 unset echo
+
+cat >! column_table <<EOF
+#Use space-delineated fields (no commas)
+DEBUG index  ORD  2 30 5
+DEBUG index  Princeton 2 37 5
+DEBUG lonlat ORD2 272. 42.
+DEBUG lonlat Princeton 285.33 40.36
+DEBUG lonlat NP 0. 90.
+DEBUG lonlat SP 0. -90.
+sonde lonlat OUN          -97.47 35.22
+sonde lonlat Amarillo    -101.70 35.22
+sonde lonlat DelRio      -100.92 29.37
+sonde lonlat Jackson      -90.08 32.32
+sonde lonlat ILX          -89.34 40.15
+sonde lonlat AtlanticCity -74.56 39.45
+sonde lonlat DodgeCity    -99.97 37.77
+EOF
+
 cat >! input.nml <<EOF
  &amip_interp_nml
      interp_oi_sst = .true.
@@ -328,6 +351,10 @@ cat >! input.nml <<EOF
        clock_grain = 'ROUTINE',
        domains_stack_size = 3000000,
        print_memory_usage = .F.
+/
+
+ &fms_affinity_nml
+      affinity=.false.
 /
 
  &fv_grid_nml
@@ -429,7 +456,7 @@ cat >! input.nml <<EOF
 
 &fv_nest_nml
     grid_pes = $npes_g1,$npes_g2
-    grid_coarse = 0,1
+    num_tile_top = 6    
     tile_coarse = 0,6
     nest_refine = 0,4
     nest_ioffsets = 999,6
@@ -451,7 +478,6 @@ cat >! input.nml <<EOF
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .T.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -524,7 +550,6 @@ cat >! input.nml <<EOF
        qi_lim = 1. ! old Fast MP
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  90.
        tau_g2v = 600.
@@ -549,10 +574,12 @@ cat >! input.nml <<EOF
        mono_prof = .false.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
        fix_negative = .true.
        icloud_f = 1
        do_hail = .F.
+/
+
+  &cld_eff_rad_nml
 /
 
   &interpolator_nml
@@ -838,7 +865,6 @@ cat >! input_nest02.nml <<EOF
        qi_lim = 1. ! old Fast MP
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  90.
        tau_g2v = 600.
@@ -863,12 +889,13 @@ cat >! input_nest02.nml <<EOF
        mono_prof = .false.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
        fix_negative = .true.
        icloud_f = 1
        do_hail = .F.
 /
 
+  &cld_eff_rad_nml
+/
 
   &interpolator_nml
        interp_method = 'conserve_great_circle'

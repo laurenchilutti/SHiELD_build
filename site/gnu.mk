@@ -39,8 +39,9 @@ else
   INCLUDE = -I$(NETCDF_ROOT)/include
   LIBS += -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz
 endif
-
+INCLUDE := $(shell pkg-config --cflags yaml-0.1)
 FPPFLAGS := -cpp -Wp,-w $(INCLUDE)
+CPPFLAGS := $(shell pkg-config --cflags yaml-0.1)
 
 FFLAGS := $(INCLUDE) -fcray-pointer -ffree-line-length-none -fno-range-check -fbacktrace
 
@@ -113,7 +114,7 @@ ifeq ($(NETCDF),3)
   endif
 endif
 
-LIBS +=
+LIBS := $(shell pkg-config --libs yaml-0.1)
 LDFLAGS += $(LIBS) -L$(NETCDF_ROOT)/lib -L$(HDF5_DIR)/lib
 
 #---------------------------------------------------------------------------

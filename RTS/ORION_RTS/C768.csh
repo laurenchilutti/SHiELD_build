@@ -14,18 +14,21 @@ module load intel/2020
 module load netcdf/
 module load hdf5/
 module load impi/2020
+module load libyaml/0.2.5
+module load python/3.9
 
 set echo
 
 set WORKDIR = "/work/noaa/gfdlscr/${USER}/"
 
+#  update BASEDIR INPUT_DATA and BUILD_AREA to match your environment
 set BASEDIR    = "$WORKDIR"
 set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
 # from YQS
 set BUILD_AREA = "~${USER}/SHiELD_Lucas/SHiELD_build/"
 
 # release number for the script
-set RELEASE = "SHiELD_FMS2020.02"
+set RELEASE = "SHiELD_FMS2022.03"
 
 # case specific details
 set TYPE = "nh"         # choices:  nh, hydro
@@ -192,6 +195,8 @@ EOF
 cp ${BUILD_AREA}/RUN/RETRO/data_table data_table
 cp ${BUILD_AREA}/RUN/RETRO/diag_table_hwt_test diag_table
 cp ${BUILD_AREA}/RUN/RETRO/field_table_6species field_table
+python3 ${BUILD_AREA}/fms_yaml_tools/data_table/data_table_to_yaml.py -f data_table
+python3 ${BUILD_AREA}/fms_yaml_tools/field_table/field_to_yaml.py field_table
 cp $executable .
 
 # GFS standard input data
@@ -237,6 +242,10 @@ cat > input.nml <<EOF
        clock_grain = 'ROUTINE',
        domains_stack_size = 3000000,
        print_memory_usage = .false.
+/
+
+ &fms_affinity_nml
+      affinity=.false.
 /
 
  &fv_grid_nml
@@ -319,7 +328,6 @@ cat > input.nml <<EOF
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .false.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -416,7 +424,6 @@ cat > input.nml <<EOF
        qi_lim = 1.
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .false.
        tau_l2v = 300.
        tau_l2v = 225.
        tau_v2l = 150.
@@ -443,10 +450,12 @@ cat > input.nml <<EOF
        mono_prof = .true.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
        fix_negative = .true.
        icloud_f = 0
        mp_time = 150.
+/
+
+ &cld_eff_rad_nml
 /
 
  &gfdl_mp_nml

@@ -14,8 +14,12 @@ module load intel/2020
 module load netcdf/
 module load hdf5/
 module load impi/2020
+module load libyaml/0.2.5
+module load python/3.9
+
 set echo
 
+#  update WORKDIR BASEDIR INPUT_DATA and BUILD_AREA to match your environment
 set WORKDIR = "/work/noaa/gfdlscr/${USER}/"
 
 set BASEDIR    = "$WORKDIR"
@@ -25,7 +29,7 @@ set INPUT_DATA1 = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA1/"
 set BUILD_AREA = "/home/${USER}/SHiELD_Lucas/SHiELD_build/"
 
 # release number for the script
-set RELEASE = "SHiELD_FMS2020.02"
+set RELEASE = "SHiELD_FMS2022.03"
 
 # case specific details
 set TYPE = "nh"         # choices:  nh, hydro
@@ -225,6 +229,8 @@ EOF
 cp ${BUILD_AREA}/RUN/RETRO/data_table data_table
 cp ${BUILD_AREA}/RUN/RETRO/diag_table_hwt_test diag_table
 cp ${BUILD_AREA}/RUN/RETRO/field_table_6species field_table
+python3 ${BUILD_AREA}/fms_yaml_tools/data_table/data_table_to_yaml.py -f data_table
+python3 ${BUILD_AREA}/fms_yaml_tools/field_table/field_to_yaml.py field_table
 cp $executable .
 
 mkdir -p INPUT/
@@ -287,6 +293,10 @@ flush_nc_files = .true.
        clock_grain = 'ROUTINE',
        domains_stack_size = 3000000,
        print_memory_usage = .F.
+/
+
+ &fms_affinity_nml
+      affinity=.false.
 /
 
  &fv_grid_nml
@@ -368,7 +378,7 @@ flush_nc_files = .true.
 
 &fv_nest_nml
     grid_pes = $npes_g1,$npes_g2
-    grid_coarse = 0,1
+    num_tile_top = 6
     tile_coarse = 0,6
     nest_refine = 0,3
     nest_ioffsets = 999,49
@@ -386,7 +396,6 @@ flush_nc_files = .true.
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .false.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -426,7 +435,6 @@ flush_nc_files = .true.
        cal_pre        = .true.
        redrag         = .true.
        dspheat        = .true.
-       satmedmf       = .false.
        ysupbl         = .false.
        hybedmf        = .true.
        random_clds    = .true.
@@ -506,6 +514,12 @@ flush_nc_files = .true.
        fix_negative = .true.
        mp_time = 90.
        icloud_f = 1
+/
+
+  &gfdl_mp_nml
+/
+
+  &cld_eff_rad_nml
 /
 
   &interpolator_nml
@@ -798,6 +812,11 @@ flush_nc_files = .true.
        mp_time = $dt_atmos
 /
 
+  &gfdl_mp_nml
+/
+
+  &cld_eff_rad_nml
+/
 
   &interpolator_nml
        interp_method = 'conserve_great_circle'

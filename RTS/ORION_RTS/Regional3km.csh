@@ -14,9 +14,12 @@ module load intel/2020
 module load netcdf/
 module load hdf5/
 module load impi/2020
+module load libyaml/0.2.5
+module load python/3.9
 
 set echo
 
+#  update WORKDIR BASEDIR INPUT_DATA and BUILD_AREA to match your environment
 set WORKDIR = "/work/noaa/gfdlscr/${USER}/"
 
 set BASEDIR    = "$WORKDIR"
@@ -214,6 +217,8 @@ cat ${BUILD_AREA}/FV3GFS/RUN/RETRO/diag_table_hwt_simple >> diag_table
 # copy over the other tables and executable
 cp ${BUILD_AREA}/RUN/RETRO/data_table data_table
 cp ${BUILD_AREA}/RUN/RETRO/field_table_6species field_table
+python3 ${BUILD_AREA}/fms_yaml_tools/data_table/data_table_to_yaml.py -f data_table
+python3 ${BUILD_AREA}/fms_yaml_tools/field_table/field_to_yaml.py field_table
 cp $executable .
 
 # GFS standard input data
@@ -271,6 +276,10 @@ else
    else
     ln -s $restart_file/* INPUT/.
    endif
+   foreach out1 (`ls *_table`)
+     set split = ($out1:as/./ /)
+     mv $out1 $split[2]
+   end
 
    # reset values in input.nml for restart run
    set make_nh = ".F."
@@ -324,6 +333,10 @@ cat >! input.nml <<EOF
        print_memory_usage = .F.
 /
 
+ &fms_affinity_nml
+      affinity=.false.
+/
+
  &fv_grid_nml
        grid_file = 'INPUT/grid_spec.nc' ! This line is IMPORTANT for regional model
 /
@@ -359,7 +372,7 @@ cat >! input.nml <<EOF
        k_split  = $k_split
        n_split  = $n_split
        nwat = 6 
-       na_init = 1
+       na_init = $na_init
        d_ext = 0.0
        dnats = 2 ! 2019: improved efficiency by not advecting o3
        fv_sg_adj = 1800 ! 2019: full-domain weak 2dz damping
@@ -370,10 +383,10 @@ cat >! input.nml <<EOF
        d4_bg = 0.14
        vtdm4 = 0.02
        do_vort_damp = .T.
-       external_ic = .T.
-       nggps_ic = .T.
+       external_ic = $external_ic
+       nggps_ic = $nggps_ic
        hrrrv3_ic= .F.
-       mountain = .F.
+       mountain = $mountain
        ncep_ic = .F.
        d_con = 1.0 ! 2019: Full-strength dissipative heating
        hord_mt = 6
@@ -388,7 +401,7 @@ cat >! input.nml <<EOF
        consv_am = .F.
        dwind_2d = .F.
        print_freq = $print_freq
-       warm_start = .F.
+       warm_start = $warm_start
        no_dycore = $no_dycore
 
        rf_fast = .F.
@@ -414,7 +427,6 @@ cat >! input.nml <<EOF
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .T.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -472,7 +484,6 @@ cat >! input.nml <<EOF
        do_deep        = .false.
        do_ocean       = .true. ! 2019: Using an hfvGFS-like setting
        ysupbl         = .true. ! 201907h6: restored YSU
-       satmedmf       = .false.
        do_inline_mp   = .true.
        xkzminv        = 0.0  ! 2019: NO diffusion in inversion layers
        xkzm_h         = 0.2  ! 2019: YSU default (note divided by 2 inside scheme)
@@ -523,7 +534,6 @@ cat >! input.nml <<EOF
        qi_lim = 2.
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  22.5 ! 201907d: short timescale introduced
        tau_g2v = 900. ! 2019: increased
@@ -547,7 +557,6 @@ cat >! input.nml <<EOF
        use_ccn = .true.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
        fix_negative = .true.
        icloud_f = 0     ! 2019: enabled
        do_hail = .true. ! 2019: enabled
@@ -606,6 +615,8 @@ mp_time = $dt_atmos
 
 /
 
+  &cld_eff_rad_nml
+/
 
  &cloud_diagnosis_nml
        ql0_max = 2.0e-3
