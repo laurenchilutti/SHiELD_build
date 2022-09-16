@@ -29,10 +29,15 @@ MAKEFLAGS += --jobs=8
 
 NETCDF_ROOT = $(NETCDF_DIR)
 MPI_ROOT    = $(MPICH_DIR)
-ifeq (`nf-config --fc`,gfortran)
-INCLUDE = "`nf-config --fflags` `nc-config --cflags`"
+# start with blank LIB
+LIBS :=
+
+ifneq (`nc-config --libs`,)
+  INCLUDE = `nf-config --fflags` `nc-config --cflags`
+  LIBS += `nf-config --flibs` `nc-config --libs`
 else
-INCLUDE = -I$(NETCDF_ROOT)/include
+  INCLUDE = -I$(NETCDF_ROOT)/include
+  LIBS += -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz
 endif
 INCLUDE := $(shell pkg-config --cflags yaml-0.1)
 FPPFLAGS := -cpp -Wp,-w $(INCLUDE)
@@ -72,9 +77,6 @@ LDFLAGS := -L/usr/lib
 LDFLAGS_OPENMP := -fopenmp
 LDFLAGS_VERBOSE := --verbose
 
-# start with blank LIBS
-LIBS :=
-
 ifneq ($(REPRO),)
 CFLAGS += $(CFLAGS_REPRO)
 FFLAGS += $(FFLAGS_REPRO)
@@ -111,9 +113,6 @@ ifeq ($(NETCDF),3)
     CPPDEFS += -Duse_LARGEFILE
   endif
 endif
-
-# NetCDF libraries
-LIBS += -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz
 
 LIBS := $(shell pkg-config --libs yaml-0.1)
 LDFLAGS += $(LIBS) -L$(NETCDF_ROOT)/lib -L$(HDF5_DIR)/lib
