@@ -531,7 +531,6 @@ cat >! input.nml <<EOF
 /
 
  &gfdl_mp_nml
-       sedi_transport = .F. 
        do_sedi_heat = .F.   
        rad_snow = .true.
        rad_graupel = .true.
@@ -549,10 +548,8 @@ cat >! input.nml <<EOF
        qi_lim = 1. ! old Fast MP
        prog_ccn = .false.
        do_qa = .true.
-       !fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  90.
-       tau_g2v = 600.
        rthresh = 10.0e-6  ! This is a key parameter for cloud water ! use 10 for shallow conv
        dw_land  = 0.16
        dw_ocean = 0.10
@@ -563,18 +560,13 @@ cat >! input.nml <<EOF
        tau_i2s = 1000.   !ice to snow autoconversion time
        c_psaci = 0.1   
        c_pgacs = 0.1 ! 100x increased rain --> graupel accretion
-       c_cracw = 1.0 
        rh_inc = 0.30
        rh_inr = 0.30
        rh_ins = 0.30
        ccn_l = 270. !for CONUS
        ccn_o = 90.
-       use_ppm = .T.  ! set to true
-       use_ccn = .true.
-       mono_prof = .false.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       !de_ice = .false.
        fix_negative = .true.
        icloud_f = 1
        do_hail = .F.
@@ -848,7 +840,6 @@ cat >! input_nest02.nml <<EOF
 /
 
  &gfdl_mp_nml
-       sedi_transport = .F. 
        do_sedi_heat = .F.   
        rad_snow = .true.
        rad_graupel = .true.
@@ -866,10 +857,8 @@ cat >! input_nest02.nml <<EOF
        qi_lim = 1. ! old Fast MP
        prog_ccn = .false.
        do_qa = .true.
-       !fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  90.
-       tau_g2v = 600.
        rthresh = 10.0e-6  ! This is a key parameter for cloud water ! use 10 for shallow conv
        dw_land  = 0.16
        dw_ocean = 0.10
@@ -880,18 +869,13 @@ cat >! input_nest02.nml <<EOF
        tau_i2s = 1000.   !ice to snow autoconversion time
        c_psaci = 0.1   
        c_pgacs = 0.1 ! 100x increased rain --> graupel accretion
-       c_cracw = 1.0 
        rh_inc = 0.30
        rh_inr = 0.30
        rh_ins = 0.30
        ccn_l = 270. !for CONUS
        ccn_o = 90.
-       use_ppm = .T.  ! set to true
-       use_ccn = .true.
-       mono_prof = .false.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       !de_ice = .false.
        fix_negative = .true.
        icloud_f = 1
        do_hail = .F.

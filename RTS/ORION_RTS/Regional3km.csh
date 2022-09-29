@@ -566,7 +566,6 @@ mp_time = $dt_atmos
 
 
  &gfdl_mp_nml
-       sedi_transport = .T.  ! 2019: enabled
        do_sedi_heat = .T.    ! 2019: enabled
        do_sedi_w = .T.       ! 2019: enabled
        rad_snow = .true.
@@ -583,10 +582,8 @@ mp_time = $dt_atmos
        qi_lim = 2.
        prog_ccn = .false.
        do_qa = .true.
-       !fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  22.5 ! 201907d: short timescale introduced
-       tau_g2v = 900. ! 2019: increased
        rthresh = 10.0e-6
        dw_land  = 0.16
        dw_ocean = 0.10
@@ -597,17 +594,13 @@ mp_time = $dt_atmos
        tau_i2s = 1000.
        c_psaci = 0.05 ! 2019: decreased
        c_pgacs = 0.2  ! 2019: increased substantially; improves rainfall coverage
-       c_cracw = 0.75 ! 2019: decreased
        rh_inc = 0.30
        rh_inr = 0.30
        rh_ins = 0.30
        ccn_l = 300.   ! 2019: Increased
        ccn_o = 100.   ! 2019: increased
-       use_ppm = .F.  ! 2019: Disabled
-       use_ccn = .true.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       !de_ice = .false.
        fix_negative = .true.
        icloud_f = 0     ! 2019: enabled
        do_hail = .true. ! 2019: enabled
