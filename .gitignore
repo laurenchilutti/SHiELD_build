@@ -8,4 +8,4 @@ libFMS
 nceplibs
 *.out
 .lib*
-CI
+/CI
