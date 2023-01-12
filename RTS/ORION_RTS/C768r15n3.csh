@@ -1,13 +1,4 @@
 #!/bin/tcsh
-#SBATCH --output=/home/jmoualle/ORION_RT/stdout/%x.%j
-#SBATCH --job-name=C768r15n3
-#SBATCH -A gfdlhires
-#SBATCH --partition=orion
-#SBATCH --time=00:20:00
-#SBATCH --nodes=74
-#SBATCH --exclusive
-#SBATCH --mail-user=joseph.mouallem@noaa.gov
-#SBATCH --mail-type=ALL
 
 source ${MODULESHOME}/init/tcsh
 module load intel/2020
@@ -15,17 +6,28 @@ module load netcdf/
 module load hdf5/
 module load impi/2020
 set echo
+#You can override BASEDIR and INPUT_DATA and COMPILER by defining them as
+#environment variables before running this script
+if (! $?BASEDIR) then
+  set BASEDIR = "/work/noaa/gfdlscr/${USER}/"
+endif
+if (! $?INPUT_DATA) then
+  set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
+endif
+if (! $?INPUT_DATA1) then
+  set INPUT_DATA1 = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA1/"
+endif
+if (! $?COMPILER) then
+  set COMPILER = "intel"
+endif
 
-set WORKDIR = "/work/noaa/gfdlscr/${USER}/"
-
-set BASEDIR    = "$WORKDIR"
-set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
-set INPUT_DATA1 = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA1/"
-# from YQS
-set BUILD_AREA = "/home/${USER}/SHiELD_Lucas/SHiELD_build/"
+# You need to define the environment variable BUILD_AREA before running script
+if (! $?BUILD_AREA) then
+  echo "\nERROR:\tset BUILD_AREA to the base path /<path>/SHiELD_build/"
+endif
 
 # release number for the script
-set RELEASE = "SHiELD_FMS2020.02"
+set RELEASE = "`cat ${BUILD_AREA}/release`"
 
 # case specific details
 set TYPE = "nh"         # choices:  nh, hydro
@@ -40,7 +42,7 @@ set NO_SEND = "no_send"    # choices:  send, no_send
 set EXE = "x"
 # directory structure
 set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
-set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${EXE}
+set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${EXE}
 
 # input filesets
 set ICS  = ${INPUT_DATA1}/variable.v201810/${CASE}/${NAME}_IC/GFS_INPUT.tar
@@ -386,7 +388,6 @@ flush_nc_files = .true.
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .false.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -426,7 +427,6 @@ flush_nc_files = .true.
        cal_pre        = .true.
        redrag         = .true.
        dspheat        = .true.
-       satmedmf       = .false.
        ysupbl         = .false.
        hybedmf        = .true.
        random_clds    = .true.

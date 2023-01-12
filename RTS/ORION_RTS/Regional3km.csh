@@ -1,13 +1,4 @@
 #!/bin/tcsh
-#SBATCH --output=/home/jmoualle/ORION_RT/stdout/%x.%j
-#SBATCH --job-name=Regional3km
-#SBATCH -A gfdlhires
-#SBATCH --partition=orion
-#SBATCH --time=00:20:00
-#SBATCH --nodes=24
-#SBATCH --exclusive
-#SBATCH --mail-user=joseph.mouallem@noaa.gov
-#SBATCH --mail-type=ALL
 
 source ${MODULESHOME}/init/tcsh
 module load intel/2020
@@ -16,13 +7,22 @@ module load hdf5/
 module load impi/2020
 
 set echo
+#You can override BASEDIR and INPUT_DATA and COMPILER by defining them as
+#environment variables before running this script
+if (! $?BASEDIR) then
+  set BASEDIR = "/work/noaa/gfdlscr/${USER}/"
+endif
+if (! $?INPUT_DATA) then
+  set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
+endif
+if (! $?COMPILER) then
+  set COMPILER = "intel"
+endif
 
-set WORKDIR = "/work/noaa/gfdlscr/${USER}/"
-
-set BASEDIR    = "$WORKDIR"
-set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/SHiELD_IC/Alaska_c3072/"
-# from YQS
-set BUILD_AREA = "~${USER}/SHiELD_Lucas/SHiELD_build/"
+# You need to define the environment variable BUILD_AREA before running script
+if (! $?BUILD_AREA) then
+  echo "\nERROR:\tset BUILD_AREA to the base path /<path>/SHiELD_build/"
+endif
 
 #set hires_oro_factor = 12
 set res = 3072
@@ -43,13 +43,13 @@ set NO_SEND = "send"  # choices:  send, no_send
 set EXE = "x"
 # directory structure
 set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
-set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${EXE}
+set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${EXE}
 
 # input filesets
-set ICS  = ${INPUT_DATA}/${NAME}_IC/
-set FIX  = /work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/fix.v201810
-set GFS  = /work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/GFS_STD_INPUT.20160311.tar
-set GRID = ${INPUT_DATA}/GRID/
+set ICS  = ${INPUT_DATA}/SHiELD_IC/Alaska_c3072/${NAME}_IC/
+set FIX  = ${INPUT_DATA}/fix.v201810
+set GFS  = ${INPUT_DATA}/GFS_STD_INPUT.20160311.tar
+set GRID = ${INPUT_DATA}/SHiELD_IC/Alaska_c3072/GRID/
 
 # sending file to gfdl
 set gfdl_archive = /archive/${USER}/SHiELD_S2S/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
@@ -414,7 +414,6 @@ cat >! input.nml <<EOF
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .T.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -472,7 +471,6 @@ cat >! input.nml <<EOF
        do_deep        = .false.
        do_ocean       = .true. ! 2019: Using an hfvGFS-like setting
        ysupbl         = .true. ! 201907h6: restored YSU
-       satmedmf       = .false.
        do_inline_mp   = .true.
        xkzminv        = 0.0  ! 2019: NO diffusion in inversion layers
        xkzm_h         = 0.2  ! 2019: YSU default (note divided by 2 inside scheme)
@@ -557,7 +555,6 @@ mp_time = $dt_atmos
 
 
  &gfdl_mp_nml
-       sedi_transport = .T.  ! 2019: enabled
        do_sedi_heat = .T.    ! 2019: enabled
        do_sedi_w = .T.       ! 2019: enabled
        rad_snow = .true.
@@ -574,10 +571,8 @@ mp_time = $dt_atmos
        qi_lim = 2.
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  22.5 ! 201907d: short timescale introduced
-       tau_g2v = 900. ! 2019: increased
        rthresh = 10.0e-6
        dw_land  = 0.16
        dw_ocean = 0.10
@@ -588,24 +583,19 @@ mp_time = $dt_atmos
        tau_i2s = 1000.
        c_psaci = 0.05 ! 2019: decreased
        c_pgacs = 0.2  ! 2019: increased substantially; improves rainfall coverage
-       c_cracw = 0.75 ! 2019: decreased
        rh_inc = 0.30
        rh_inr = 0.30
        rh_ins = 0.30
        ccn_l = 300.   ! 2019: Increased
        ccn_o = 100.   ! 2019: increased
-       use_ppm = .F.  ! 2019: Disabled
-       use_ccn = .true.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
        fix_negative = .true.
        icloud_f = 0     ! 2019: enabled
        do_hail = .true. ! 2019: enabled
        do_cond_timescale = .true. ! 201984zb
 
 /
-
 
  &cloud_diagnosis_nml
        ql0_max = 2.0e-3

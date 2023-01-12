@@ -1,13 +1,4 @@
 #!/bin/tcsh
-#SBATCH --output=/home/jmoualle/ORION_RT/stdout/%x.%j
-#SBATCH --job-name=C48n4
-#SBATCH --partition=debug
-#SBARCH --qos=debug
-#SBATCH --time=00:04:00
-#SBATCH --nodes=20
-#SBATCH --exclusive
-#SBATCH --mail-user=joseph.mouallem@noaa.gov
-#SBATCH --mail-type=ALL
 
 source ${MODULESHOME}/init/tcsh
 module load intel/2020
@@ -16,14 +7,25 @@ module load hdf5/
 module load impi/2020
 
 set echo
+#You can override BASEDIR and INPUT_DATA and COMPILER by defining them as
+#environment variables before running this script
+if (! $?BASEDIR) then
+  set BASEDIR = "/work/noaa/gfdlscr/${USER}/"
+endif
+if (! $?INPUT_DATA) then
+  set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
+endif
+if (! $?COMPILER) then
+  set COMPILER = "intel"
+endif
 
-set BASEDIR    = "/work/noaa/gfdlscr/${USER}/"
-set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
-# from YQS
-set BUILD_AREA = "~${USER}/SHiELD_Lucas/SHiELD_build/"
+# Need to define env variable BUILD_AREA before running script
+if (! $?BUILD_AREA) then
+  echo "\nERROR:\tset BUILD_AREA to the base path /<path>/SHiELD_build/"
+endif
 
 # release number for the script
-set RELEASE = "SHiELD_FMS2020.02"
+set RELEASE = "`cat ${BUILD_AREA}/release`"
 
 #set hires_oro_factor = 3
 set res = 48
@@ -42,7 +44,7 @@ set NO_SEND = "no_send"  # choices:  send, no_send
 set EXE  = x
 # directory structure
 set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}.${MEMO}/
-set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${EXE}
+set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${EXE}
 
 # sending file to gfdl
 set gfdl_archive = /archive/${USER}/SHiELD_S2S/${NAME}.${CASE}.${TYPE}.${MODE}.${MEMO}/
@@ -295,6 +297,24 @@ cp INPUT/sfc_emissivity_idx.txt .
 cp INPUT/solarconstant_noaa_an.txt .
 
 unset echo
+
+cat >! column_table <<EOF
+#Use space-delineated fields (no commas)
+DEBUG index  ORD  2 30 5
+DEBUG index  Princeton 2 37 5
+DEBUG lonlat ORD2 272. 42.
+DEBUG lonlat Princeton 285.33 40.36
+DEBUG lonlat NP 0. 90.
+DEBUG lonlat SP 0. -90.
+sonde lonlat OUN          -97.47 35.22
+sonde lonlat Amarillo    -101.70 35.22
+sonde lonlat DelRio      -100.92 29.37
+sonde lonlat Jackson      -90.08 32.32
+sonde lonlat ILX          -89.34 40.15
+sonde lonlat AtlanticCity -74.56 39.45
+sonde lonlat DodgeCity    -99.97 37.77
+EOF
+
 cat >! input.nml <<EOF
  &amip_interp_nml
      interp_oi_sst = .true.
@@ -429,7 +449,7 @@ cat >! input.nml <<EOF
 
 &fv_nest_nml
     grid_pes = $npes_g1,$npes_g2
-    grid_coarse = 0,1
+    num_tile_top = 6
     tile_coarse = 0,6
     nest_refine = 0,4
     nest_ioffsets = 999,6
@@ -451,7 +471,6 @@ cat >! input.nml <<EOF
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .T.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 /
@@ -506,7 +525,6 @@ cat >! input.nml <<EOF
 /
 
  &gfdl_mp_nml
-       sedi_transport = .F. 
        do_sedi_heat = .F.   
        rad_snow = .true.
        rad_graupel = .true.
@@ -524,10 +542,8 @@ cat >! input.nml <<EOF
        qi_lim = 1. ! old Fast MP
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  90.
-       tau_g2v = 600.
        rthresh = 10.0e-6  ! This is a key parameter for cloud water ! use 10 for shallow conv
        dw_land  = 0.16
        dw_ocean = 0.10
@@ -538,18 +554,13 @@ cat >! input.nml <<EOF
        tau_i2s = 1000.   !ice to snow autoconversion time
        c_psaci = 0.1   
        c_pgacs = 0.1 ! 100x increased rain --> graupel accretion
-       c_cracw = 1.0 
        rh_inc = 0.30
        rh_inr = 0.30
        rh_ins = 0.30
        ccn_l = 270. !for CONUS
        ccn_o = 90.
-       use_ppm = .T.  ! set to true
-       use_ccn = .true.
-       mono_prof = .false.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
        fix_negative = .true.
        icloud_f = 1
        do_hail = .F.
@@ -820,7 +831,6 @@ cat >! input_nest02.nml <<EOF
 /
 
  &gfdl_mp_nml
-       sedi_transport = .F. 
        do_sedi_heat = .F.   
        rad_snow = .true.
        rad_graupel = .true.
@@ -838,10 +848,8 @@ cat >! input_nest02.nml <<EOF
        qi_lim = 1. ! old Fast MP
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .F.
        tau_l2v = 180
        tau_v2l =  90.
-       tau_g2v = 600.
        rthresh = 10.0e-6  ! This is a key parameter for cloud water ! use 10 for shallow conv
        dw_land  = 0.16
        dw_ocean = 0.10
@@ -852,18 +860,13 @@ cat >! input_nest02.nml <<EOF
        tau_i2s = 1000.   !ice to snow autoconversion time
        c_psaci = 0.1   
        c_pgacs = 0.1 ! 100x increased rain --> graupel accretion
-       c_cracw = 1.0 
        rh_inc = 0.30
        rh_inr = 0.30
        rh_ins = 0.30
        ccn_l = 270. !for CONUS
        ccn_o = 90.
-       use_ppm = .T.  ! set to true
-       use_ccn = .true.
-       mono_prof = .false.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
        fix_negative = .true.
        icloud_f = 1
        do_hail = .F.

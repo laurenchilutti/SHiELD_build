@@ -1,12 +1,4 @@
 #!/bin/tcsh
-#SBATCH --output=/home/jmoualle/ORION_RT/stdout/%x.%j
-#SBATCH --job-name=C48_res
-#SBATCH --partition=orion
-#SBATCH --time=00:10:00
-#SBATCH --nodes=5
-#SBATCH --exclusive
-#SBATCH --mail-user=joseph.mouallem@noaa.gov
-#SBATCH --mail-type=ALL
 
 source ${MODULESHOME}/init/tcsh
 module load intel/2020
@@ -15,15 +7,25 @@ module load hdf5/
 module load impi/2020
 
 set echo
+#You can override WORKDIR and INPUT_DATA and COMPILER by defining them as
+#environment variables before running this script
+if (! $?BASEDIR) then
+  set BASEDIR = "/work/noaa/gfdlscr/${USER}/"
+endif
+if (! $?INPUT_DATA) then
+  set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
+endif
+if (! $?COMPILER) then
+  set COMPILER = "intel"
+endif
 
-set BASEDIR    = "/work/noaa/gfdlscr/${USER}/"
-set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
-# from YQS
-set BUILD_AREA = "/home/jmoualle/SHiELD_Lucas/SHiELD_build/"
-
+# You need to define the environment variable BUILD_AREA before running script
+if (! $?BUILD_AREA) then
+  echo "\nERROR:\tset BUILD_AREA to the base path /<path>/SHiELD_build/"
+endif
 
 # release number for the script
-set RELEASE = "SHiELD_FMS2020.02"
+set RELEASE = "`cat ${BUILD_AREA}/release`"
 
 #set hires_oro_factor = 3
 set res = 48
@@ -50,7 +52,7 @@ set EXE = "x"
 
 # directory structure
 set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}.${MEMO}/
-set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${EXE}
+set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${EXE}
 
 # sending file to gfdl
 set gfdl_archive = /archive/${USER}/SHiELD_S2S/${NAME}.${CASE}.${TYPE}.${MODE}.${MEMO}/
@@ -406,7 +408,6 @@ cat >! input.nml <<EOF
        dt_ocean = $dt_atmos
        current_date =  $curr_date
        calendar = 'julian'
-       memuse_verbose = .false.
        atmos_nthreads = $nthreads
        use_hyper_thread = $hyperthread
 !       ncores_per_node = $cores_per_node
@@ -541,7 +542,6 @@ cat >! input.nml <<EOF
 
 
  &gfdl_mp_nml
-       sedi_transport = .true.
        do_sedi_heat = .true.
        rad_snow = .true.
        rad_graupel = .true.
@@ -561,10 +561,8 @@ cat >! input.nml <<EOF
        qi_lim = 1.
        prog_ccn = .false.
        do_qa = .true.
-       fast_sat_adj = .false.
        tau_l2v = 225.
        tau_v2l = 150.
-       tau_g2v = 900.
        rthresh = 10.e-6  ! This is a key parameter for cloud water
        dw_land  = 0.16
        dw_ocean = 0.10
@@ -581,13 +579,8 @@ cat >! input.nml <<EOF
        ccn_l = 300.
        ccn_o = 100.
        c_paut = 0.5
-       c_cracw = 0.8
-       use_ppm = .false.
-       use_ccn = .true.
-       mono_prof = .false.
        z_slope_liq  = .true.
        z_slope_ice  = .true.
-       de_ice = .false.
        fix_negative = .false.
        icloud_f = 0
 /
