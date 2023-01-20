@@ -13,7 +13,10 @@ if (! $?BASEDIR) then
   set BASEDIR = "/work/noaa/gfdlscr/${USER}/"
 endif
 if (! $?INPUT_DATA) then
-  set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
+  set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/SHiELD_IC/Alaska_c3072/"
+endif
+if (! $?INPUT_DATA1) then
+  set INPUT_DATA1 = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
 endif
 if (! $?COMPILER) then
   set COMPILER = "intel"
@@ -46,10 +49,10 @@ set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${
 set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${EXE}
 
 # input filesets
-set ICS  = ${INPUT_DATA}/SHiELD_IC/Alaska_c3072/${NAME}_IC/
-set FIX  = ${INPUT_DATA}/fix.v201810
-set GFS  = ${INPUT_DATA}/GFS_STD_INPUT.20160311.tar
-set GRID = ${INPUT_DATA}/SHiELD_IC/Alaska_c3072/GRID/
+set ICS  = ${INPUT_DATA}/${NAME}_IC/
+set FIX  = ${INPUT_DATA1}/fix.v201810
+set GFS  = ${INPUT_DATA1}/GFS_STD_INPUT.20160311.tar
+set GRID = ${INPUT_DATA}/GRID/
 
 # sending file to gfdl
 set gfdl_archive = /archive/${USER}/SHiELD_S2S/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}${MEMO}/
@@ -322,6 +325,10 @@ cat >! input.nml <<EOF
        clock_grain = 'ROUTINE',
        domains_stack_size = 3000000,
        print_memory_usage = .F.
+/
+
+ &fms_affinity_nml
+       affinity=.false.
 /
 
  &fv_grid_nml

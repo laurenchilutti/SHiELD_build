@@ -9,3 +9,4 @@ nceplibs
 *.out
 .lib*
 /CI
+release

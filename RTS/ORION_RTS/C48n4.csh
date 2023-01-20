@@ -350,6 +350,10 @@ cat >! input.nml <<EOF
        print_memory_usage = .F.
 /
 
+ &fms_affinity_nml
+       affinity=.false.
+/
+
  &fv_grid_nml
        !grid_file = 'INPUT/grid_spec.nc'
 /

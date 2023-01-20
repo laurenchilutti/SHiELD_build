@@ -113,7 +113,7 @@ set TIME_STAMP = /home/${USER}/Util/time_stamp.csh
     # set various debug options
     set no_dycore = ".F."
     set dycore_only = ".F." 
-    set chksum_debug = ".false."
+    set chksum_debug = ".true."
     set print_freq = "-6"
 
     if (${TYPE} == "nh") then
@@ -291,6 +291,10 @@ flush_nc_files = .true.
        print_memory_usage = .F.
 /
 
+ &fms_affinity_nml
+      affinity=.false.
+/
+
  &fv_grid_nml
        !grid_file = 'INPUT/grid_spec.nc'
 /
@@ -370,7 +374,7 @@ flush_nc_files = .true.
 
 &fv_nest_nml
     grid_pes = $npes_g1,$npes_g2
-    grid_coarse = 0,1
+    num_tile_top = 6
     tile_coarse = 0,6
     nest_refine = 0,3
     nest_ioffsets = 999,49
@@ -506,6 +510,12 @@ flush_nc_files = .true.
        fix_negative = .true.
        mp_time = 90.
        icloud_f = 1
+/
+
+  &gfdl_mp_nml
+/
+
+  &cld_eff_rad_nml
 /
 
   &interpolator_nml
@@ -660,7 +670,7 @@ flush_nc_files = .true.
        no_dycore = $no_dycore
 
        !nested = .true.
-       twowaynest = .false.
+       twowaynest = .true.
        !parent_grid_num = 1
        !parent_tile = 6
        !refinement = 3
@@ -750,6 +760,7 @@ flush_nc_files = .true.
        xkzm_m         = 0.00 
 /
 
+
  &gfdl_cloud_microphysics_nml
        sedi_transport = .F. 
        do_sedi_heat = .F.   
@@ -776,13 +787,13 @@ flush_nc_files = .true.
        dw_land  = 0.16
        dw_ocean = 0.10
        ql_gen = 1.0e-3
-       qi0_crt = 1.2e-4 
-       qi0_max = 2.0e-4 
+       qi0_crt = 1.2e-4
+       qi0_max = 2.0e-4
        qs0_crt = 1.0e-3 ! 10x smaller, increase snow --> graupel AC
        tau_i2s = 1000.   !ice to snow autoconversion time
-       c_psaci = 0.1   
+       c_psaci = 0.1
        c_pgacs = 0.1 ! 100x increased rain --> graupel accretion
-       c_cracw = 1.0 
+       c_cracw = 1.0
        rh_inc = 0.30
        rh_inr = 0.30
        rh_ins = 0.30
@@ -798,6 +809,11 @@ flush_nc_files = .true.
        mp_time = $dt_atmos
 /
 
+  &gfdl_mp_nml
+/
+
+  &cld_eff_rad_nml
+/
 
   &interpolator_nml
        interp_method = 'conserve_great_circle'

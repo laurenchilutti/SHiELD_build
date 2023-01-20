@@ -49,7 +49,8 @@ set WORKDIR    = ${BASEDIR}/${RELEASE}/${NAME}.${CASE}.${TYPE}.${MODE}.${MONO}.$
 set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${EXE}
 
 # input filesets
-set ICS  = ${INPUT_DATA}/global.v201810/${CASE}/${NAME}_IC/GFS_INPUT.tar
+set ICDIR   = ${INPUT_DATA}/global.v201810/${CASE}/${NAME}_IC/
+set ICS  = ${ICDIR}/GFS_INPUT.tar
 set FIX  = ${INPUT_DATA}/fix.v201810/
 set GFS  = ${INPUT_DATA}/GFS_STD_INPUT.20160311.tar
 set GRID = ${INPUT_DATA}/global.v201810/${CASE}/GRID/
@@ -176,9 +177,16 @@ if (${RESTART_RUN} == "F") then
   cd $WORKDIR/rundir
 
   mkdir -p RESTART
+  mkdir -p INPUT
 
   # Date specific ICs
-  tar xf ${ICS}
+  #tar xf ${ICS}
+
+  if ( -e ${ICDIR}/gfs_data.tile1.nc ) then
+    ln -s ${ICDIR}/* INPUT/
+  else
+    tar xf ${ICS}
+  endif
 
   # set variables in input.nml for initial run
   set nggps_ic = ".T."
@@ -267,6 +275,10 @@ cat > input.nml <<EOF
        clock_grain = 'ROUTINE',
        domains_stack_size = 3000000,
        print_memory_usage = .false.
+/
+
+ &fms_affinity_nml
+       affinity=.false.
 /
 
  &fv_grid_nml
@@ -553,7 +565,7 @@ cat > input.nml <<EOF
        FNGLAC   = "$FIX/global_glacier.2x2.grb",
        FNMXIC   = "$FIX/global_maxice.2x2.grb",
        FNTSFC   = "$FIX/RTGSST.1982.2012.monthly.clim.grb",
-       FNMLDC   = "$FIX/../mld/mld_DR003_c1m_reg2.0.grb"
+       FNMLDC   = ""
        FNSNOC   = "$FIX/global_snoclim.1.875.grb",
        FNZORC   = "igbp",
        FNALBC   = "$FIX/global_snowfree_albedo.bosu.t1534.3072.1536.rg.grb",

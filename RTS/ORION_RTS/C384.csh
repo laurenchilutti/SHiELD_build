@@ -15,9 +15,6 @@ endif
 if (! $?INPUT_DATA) then
   set INPUT_DATA = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA/"
 endif
-if (! $?INPUT_DATA1) then
-  set INPUT_DATA1 = "/work/noaa/gfdlscr/pdata/gfdl/SHiELD/INPUT_DATA1/"
-endif
 if (! $?COMPILER) then
   set COMPILER = "intel"
 endif
@@ -271,6 +268,10 @@ cat >! input.nml <<EOF
        print_memory_usage = .false.
 /
 
+ &fms_affinity_nml
+       affinity=.false.
+/
+
  &fv_grid_nml
        grid_file = 'INPUT/grid_spec.nc'
 /
@@ -404,45 +405,7 @@ cat >! input.nml <<EOF
 /
 
 
- &gfdl_cloud_microphysics_nml
-       do_sedi_heat = .false.
-       rad_snow = .true.
-       rad_graupel = .true.
-       rad_rain = .true.
-       const_vi = .F.
-       const_vs = .F.
-       const_vg = .F.
-       const_vr = .F.
-       vi_max = 1.
-       vs_max = 2.
-       vg_max = 12.
-       vr_max = 12.
-       qi_lim = 1.
-       prog_ccn = .false.
-       do_qa = .true.
-       tau_l2v = 300.
-       tau_v2l = 150.
-       rthresh = 10.e-6  ! This is a key parameter for cloud water
-       dw_land  = 0.16
-       dw_ocean = 0.10
-       ql_gen = 1.0e-3
-       ql_mlt = 1.0e-3
-       qi0_crt = 8.0E-5
-       qs0_crt = 1.0e-3
-       tau_i2s = 1000.
-       c_psaci = 0.05
-       c_pgacs = 0.01
-       rh_inc = 0.30
-       rh_inr = 0.30
-       rh_ins = 0.30
-       ccn_l = 300.
-       ccn_o = 100.
-       c_paut = 0.5
-       z_slope_liq  = .true.
-       z_slope_ice  = .true.
-       fix_negative = .true.
-       mp_time = 150.
-
+ &gfdl_mp_nml
 /
 
 
@@ -458,7 +421,7 @@ cat >! input.nml <<EOF
        FNGLAC   = "$FIX/global_glacier.2x2.grb",
        FNMXIC   = "$FIX/global_maxice.2x2.grb",
        FNTSFC   = "$FIX/RTGSST.1982.2012.monthly.clim.grb",
-       FNMLDC   = "$FIX/../mld/mld_DR003_c1m_reg2.0.grb"
+       FNMLDC   = ""
        FNSNOC   = "$FIX/global_snoclim.1.875.grb",
        FNZORC   = "igbp",
        FNALBC   = "$FIX/global_snowfree_albedo.bosu.t1534.3072.1536.rg.grb",
