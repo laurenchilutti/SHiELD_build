@@ -6,14 +6,6 @@
 #SBATCH --time=00:10:00
 #SBATCH --nodes=6
 
-source ${MODULESHOME}/init/tcsh
-module load intel/2020
-module load netcdf/
-module load hdf5/
-module load impi/2020
-module load libyaml/0.2.5
-module load python/3.9
-
 set echo
 
 set BASEDIR    = "${SCRATCH}/${USER}/"
@@ -21,10 +13,12 @@ set INPUT_DATA = "/lustre/f2/pdata/gfdl/gfdl_W/fvGFS_INPUT_DATA"
 # from YQS
 set BUILD_AREA = "${DEV}/${USER}/SHiELD_github/SHiELD_build/"
 
-
 # release number for the script
 source fms.csh
 set RELEASE = "SHiELD_${COMPILER}_${DESCRIPTOR}_${BIT}"
+
+source ${BUILD_AREA}/site/environment.${COMPILER}.sh
+module load python/3.9
 
 #set hires_oro_factor = 3
 set res = 48
