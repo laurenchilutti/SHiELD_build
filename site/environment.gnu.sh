@@ -32,11 +32,14 @@ if [ `hostname | cut -c1-4` = "gaea" ] || [ `hostname | cut -c1-3` = "nid" ] ; t
    module rm intel
    module load   PrgEnv-gnu
    module rm gcc
-   module load gcc/9.2.0
+   #module load gcc/9.2.0
+   module load gcc/11.2.0 
+   module laod cray-hdf5
    module load cray-netcdf
    module load craype-hugepages4M
    module load libyaml/0.2.5
-   module load cmake/3.20.1
+   #module load cmake/3.20.1
+   module load cmake/3.23.1
 
    # make your compiler selections here
    export FC=ftn

@@ -1,4 +1,4 @@
-# template for the GNU fortran compiler
+# template for the Intel fortran compiler
 # typical use with mkmf
 # mkmf -t template.ifc -c"-Duse_libMPI -Duse_netCDF" path_names /usr/local/include
 ############
@@ -31,51 +31,69 @@ NETCDF_ROOT = $(NETCDF_DIR)
 MPI_ROOT    = $(MPICH_DIR)
 # start with blank LIB
 LIBS :=
+INCLUDE := $(shell pkg-config --cflags yaml-0.1)
+
+CPPDEFS += -Duse_netCDF
+
+# Additional Preprocessor Macros needed due to  Autotools and CMake
+CPPDEFS += -DHAVE_SCHED_GETAFFINITY -DHAVE_GETTID
+
+FPPFLAGS := -fpp -Wp,-w $(INCLUDE)
 
 ifneq (`nc-config --libs`,)
-  INCLUDE = `nf-config --fflags` `nc-config --cflags`
+  FPPFLAGS += `nf-config --fflags` `nc-config --cflags`
   LIBS += `nf-config --flibs` `nc-config --libs`
 else
-  INCLUDE = -I$(NETCDF_ROOT)/include
+  FPPFLAGS += -I$(NETCDF_ROOT)/include
   LIBS += -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz
 endif
-INCLUDE := $(shell pkg-config --cflags yaml-0.1)
-FPPFLAGS := -cpp -Wp,-w $(INCLUDE)
-CPPFLAGS := $(shell pkg-config --cflags yaml-0.1)
 
-FFLAGS := $(INCLUDE) -fcray-pointer -ffree-line-length-none -fno-range-check -fbacktrace -fallow-argument-mismatch
+
+FFLAGS := -fno-alias -auto -safe-cray-ptr -ftz -assume byterecl -nowarn -sox -align array64byte -traceback
 
 ifeq ($(32BIT),Y)
-CPPDEFS += -DOVERLOAD_R4 -DOVERLOAD_R8
-FFLAGS +=
+FFLAGS += -DOVERLOAD_R4 -DOVERLOAD_R8 -i4 -real-size 32
 else
-FFLAGS += -fdefault-real-8 -fdefault-double-8
+FFLAGS += -i4 -real-size 64 -no-prec-div -no-prec-sqrt
 endif
 
+ifeq ($(AVX),Y)
+FFLAGS += $(AVX_LEVEL) -qno-opt-dynamic-align
+CFLAGS += $(AVX_LEVEL) -qno-opt-dynamic-align
+else
+FFLAGS += -xCORE-AVX-I -qno-opt-dynamic-align
+CFLAGS += -xCORE-AVX-I -qno-opt-dynamic-align
+endif
 
-FFLAGS_OPT = -O2 -fno-range-check
-FFLAGS_REPRO = -O2 -ggdb -fno-range-check
-FFLAGS_DEBUG = -O0 -ggdb -fno-unsafe-math-optimizations -frounding-math -fsignaling-nans -ffpe-trap=invalid,zero,overflow -fbounds-check
+FFLAGS_OPT = -O2 -debug minimal -fp-model source -qoverride-limits -qopt-prefetch=3
+FFLAGS_REPRO = -O2 -debug minimal -fp-model source -qoverride-limits #-fpe0 #causes problems??
+FFLAGS_DEBUG = -g -O0 -debug -check -check noarg_temp_created -check nopointer -warn -warn noerrors -fp-stack-check -fstack-protector-all -fpe0 -ftrapuv
 
-TRANSCENDENTALS :=
-FFLAGS_OPENMP =  -fopenmp
-FFLAGS_VERBOSE = -v
+TRANSCENDENTALS := -fast-transcendentals
+FFLAGS_OPENMP = -qopenmp
+FFLAGS_VERBOSE = -v -V -what
 
-CFLAGS :=
+CPPFLAGS := -D__IFC $(INCLUDE)
+CPPFLAGS += $(shell nc-config --cflags)
 
-CFLAGS_OPT = -O2
-CFLAGS_REPRO = -O2 -ggdb
-CFLAGS_OPENMP = -fopenmp
-CFLAGS_DEBUG = -O0 -ggdb -g
+CFLAGS := -sox -msse2
+ifeq ($(AVX2),Y)
+#CFLAGS += -xHOST -xCORE-AVX2 -qno-opt-dynamic-align
+endif
+
+CFLAGS_OPT = -O2 -debug minimal
+CFLAGS_REPRO = -O2 -debug minimal
+CFLAGS_OPENMP = -qopenmp
+CFLAGS_DEBUG = -O0 -g -ftrapuv -traceback
 
 # Optional Testing compile flags.  Mutually exclusive from DEBUG, REPRO, and OPT
 # *_TEST will match the production if no new option(s) is(are) to be tested.
 FFLAGS_TEST = -O3 -debug minimal -fp-model source -qoverride-limits
 CFLAGS_TEST = -O2
 
-LDFLAGS := -L/usr/lib
-LDFLAGS_OPENMP := -fopenmp
-LDFLAGS_VERBOSE := --verbose
+LDFLAGS :=
+LDFLAGS_OPENMP := -qopenmp
+LDFLAGS_VERBOSE := -Wl,-V,--verbose,-cref,-M
 
 ifneq ($(REPRO),)
 CFLAGS += $(CFLAGS_REPRO)
@@ -113,9 +131,9 @@ ifeq ($(NETCDF),3)
     CPPDEFS += -Duse_LARGEFILE
   endif
 endif
-CPPDEFS += -DHAVE_GETTID
+
 LIBS := $(shell pkg-config --libs yaml-0.1)
-LDFLAGS += $(LIBS) -L$(NETCDF_ROOT)/lib -L$(HDF5_DIR)/lib
+LDFLAGS += $(LIBS)
 
 #---------------------------------------------------------------------------
 # you should never need to change any lines below.

@@ -4,20 +4,20 @@ module load fre/bronx-19
 
 echo "This script compares RESTARTS"
 
-set C768 = "n"
-set C768RES = "20160801.00Z.C768.nh.32bit.non-mono.C768/rundir/RESTART"
+set C768 = "y"
+set C768RES = "20160801.00Z.C768.nh.32bit.non-mono.C768/restart/2016080101"
 
 set C768r15n3 = "n"
 set C768r15n3RES = "20170501.00Z.C768r15n3_hwt.nh.32bit.non-monoC768r15n3/rundir/RESTART"
 
 set C48_RES = "y"
-set C48_RESRES = "20160801.00Z.C48.nh.32bit.non-mono.C48_res/restart/tmp*"
+set C48_RESRES = "20160801.00Z.C48.nh.32bit.non-mono.C48_res/restart/2016080200"
 
 set REGIONAL = "y"
-set REGIONALRES = "20170114.00Z.C3072_alaska.nh.32bit.non-monoRegional3km/restart/tmp*"
+set REGIONALRES = "20170114.00Z.C3072_alaska.nh.32bit.non-monoRegional3km/restart/2017011500"
 
 set C48n4 = "y"
-set C48n4RES = "20150801.00Z.C48n4.nh.32bit.non-mono.C48n4/rundir/RESTART"
+set C48n4RES = "20150801.00Z.C48n4.nh.32bit.non-mono.C48n4/restart/2015080300"
 
 set C48_4n2 = "n"
 set C48_4n2RES = "20200826.12Z.C48.nh.32bit.non-mono.C48_4n2/rundir/RESTART"

@@ -1,25 +1,27 @@
 #!/bin/bash
-# This script will run all CI tests on C4 
+# This script will run all CI tests on c5 
 
 export BUILDDIR="/ncrc/home1/Lauren.Chilutti/SHiELD_dev/SHiELD_build"
-export SCRATCHDIR="${SCRATCH}/${USER}/SHiELDCI_2022.04_330/"
+export SCRATCHDIR="${SCRATCH}/${USER}/SHiELDCI_c5_202301beta5/"
+export COMPILER=intel
+mkdir -p ${BUILDDIR}/RTS/CI/stdout
 
-SBATCHARGS="--account=gfdl_f --qos=debug --time=00:10:00 --clusters=c4 --output=./stdout/%x.o%j --mail-user=Lauren.Chilutti@noaa.gov --mail-type=fail"
-sbatch ${SBATCHARGS} --nodes=3 C128r20.solo.superC
-sbatch ${SBATCHARGS} --nodes=3 C128r3.solo.TC
-sbatch ${SBATCHARGS} --nodes=3 C128r3.solo.TC.d1
-sbatch ${SBATCHARGS} --nodes=3 C128r3.solo.TC.h6
-sbatch ${SBATCHARGS} --nodes=3 C128r3.solo.TC.tr8
-sbatch ${SBATCHARGS} --nodes=3 C192.sw.BLvortex
-sbatch ${SBATCHARGS} --nodes=3 C192.sw.BTwave
-sbatch ${SBATCHARGS} --nodes=3 C192.sw.modon
-sbatch ${SBATCHARGS} --nodes=6 C256r20.solo.superC
-sbatch ${SBATCHARGS} --nodes=6 C384.sw.BLvortex
-sbatch ${SBATCHARGS} --nodes=3 C384.sw.BTwave
-sbatch ${SBATCHARGS} --nodes=11 C512r20.solo.superC
-sbatch ${SBATCHARGS} --nodes=11 C768.sw.BTwave
-sbatch ${SBATCHARGS} --nodes=3 C96.solo.BCdry
-sbatch ${SBATCHARGS} --nodes=3 C96.solo.BCdry.hyd
+SBATCHARGS="--account=gfdl_f --time=00:10:00 --clusters=c5 --output=./stdout/%x.o%j --mail-user=Lauren.Chilutti@noaa.gov --mail-type=fail"
+sbatch ${SBATCHARGS} --nodes=1 C128r20.solo.superC
+sbatch ${SBATCHARGS} --nodes=1 C128r3.solo.TC
+sbatch ${SBATCHARGS} --nodes=1 C128r3.solo.TC.d1
+sbatch ${SBATCHARGS} --nodes=1 C128r3.solo.TC.h6
+sbatch ${SBATCHARGS} --nodes=1 C128r3.solo.TC.tr8
+sbatch ${SBATCHARGS} --nodes=1 C192.sw.BLvortex
+sbatch ${SBATCHARGS} --nodes=1 C192.sw.BTwave
+sbatch ${SBATCHARGS} --nodes=1 C192.sw.modon
+sbatch ${SBATCHARGS} --nodes=2 C256r20.solo.superC
+sbatch ${SBATCHARGS} --nodes=2 C384.sw.BLvortex
+sbatch ${SBATCHARGS} --nodes=1 C384.sw.BTwave
+sbatch ${SBATCHARGS} --nodes=3 C512r20.solo.superC
+sbatch ${SBATCHARGS} --nodes=3 C768.sw.BTwave
+sbatch ${SBATCHARGS} --nodes=1 C96.solo.BCdry
+sbatch ${SBATCHARGS} --nodes=1 C96.solo.BCdry.hyd
 sbatch ${SBATCHARGS} --nodes=1 C96.solo.BCmoist
 sbatch ${SBATCHARGS} --nodes=1 C96.solo.BCmoist.hyd
 sbatch ${SBATCHARGS} --nodes=1 C96.solo.BCmoist.hyd.d3

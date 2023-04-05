@@ -2,9 +2,9 @@
 #SBATCH --output=./stdout/%x.%j
 #SBATCH --job-name=Regional3km
 #SBATCH --account=gfdl_f
-#SBATCH --clusters=c4
+#SBATCH --clusters=c5
 #SBATCH --time=00:30:00
-#SBATCH --nodes=25
+#SBATCH --nodes=8
 
 set echo
 
