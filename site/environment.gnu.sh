@@ -35,12 +35,13 @@ case $hostname in
        module rm intel
        module load   PrgEnv-gnu
        module rm gcc
+       module load python/3.9
+       module load cmake/3.23.1
+       module load libyaml/0.2.5
        module load gcc/10.3.0
        module load cray-hdf5/1.12.2.3
        module load cray-netcdf/4.9.0.3
        module load craype-hugepages4M
-       module load cmake/3.23.1
-       module load libyaml/0.2.5
 
        # Add -DHAVE_GETTID to the FMS cppDefs
        export FMS_CPPDEFS=-DHAVE_GETTID
@@ -69,12 +70,13 @@ case $hostname in
        module rm intel
        module load   PrgEnv-gnu
        module rm gcc
+       modele load python/3.9
+       module load cmake/3.20.1
+       module load libyaml/0.2.5
        module load gcc/10.3.0
        module load cray-hdf5/1.12.1.3
        module load cray-netcdf/4.8.1.3
        module load craype-hugepages4M
-       module load cmake/3.20.1
-       module load libyaml/0.2.5
 
        # Add -DHAVE_GETTID to the FMS cppDefs
        export FMS_CPPDEFS=-DHAVE_GETTID
