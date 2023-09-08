@@ -50,7 +50,7 @@ do
         BIT="${arg#*=}"
         shift # remove "bit" from processing
         ;;
-        intel|gnu|nvhpc)
+        intel|intel-icx|gnu|nvhpc)
         COMPILER="${arg#*=}"
         shift # Remove COMPILER from processing
         ;;

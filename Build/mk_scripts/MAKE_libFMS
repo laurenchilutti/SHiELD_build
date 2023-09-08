@@ -36,7 +36,7 @@ YAML="noyaml"
 for arg in "$@"
 do
     case $arg in
-        intel|gnu|nvhpc)
+        intel|intel-icx|gnu|nvhpc)
         COMPILER="${arg#*=}"
         shift # Remove compiler from processing
         ;;
