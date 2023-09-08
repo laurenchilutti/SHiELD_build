@@ -5,7 +5,7 @@ export COMPILER="intel"
 ACCOUNT="gfdl_f"
 export BUILDDIR="/ncrc/home1/Lauren.Chilutti/SHiELD_dev/SHiELD_build"
 RELEASE="`cat ${BUILDDIR}/../SHiELD_SRC/release`"
-export SCRATCHDIR="${SCRATCH}/${USER}/soloCI_${RELEASE}"
+export SCRATCHDIR="${SCRATCH}/${USER}/soloCI_C4_${RELEASE}"
 
 mkdir -p ${BUILDDIR}/RTS/CI/stdout
 

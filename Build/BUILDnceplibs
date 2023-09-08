@@ -36,7 +36,7 @@ version_w3nco="v2.4.1"
   for arg in "$@"
   do
       case $arg in
-          intel|gnu|nvhpc)
+          intel|intel-icx|gnu|nvhpc)
              compiler="${arg#*=}"
              shift # Remove "compiler" from processing
              ;;
@@ -46,13 +46,20 @@ version_w3nco="v2.4.1"
           fi
           echo -e ' '
           echo -e "valid options are:"
-          echo -e "\t[intel(D) | gnu | nvhpc] \t\t\t compiler"
+          echo -e "\t[intel(D) | intel-icx | gnu | nvhpc] \t\t\t compiler"
           echo -e "\n"
           exit
           ;;
       esac
   done
 
+# intel-icx is not supported by these libraries so using intel
+if [ $compiler == "intel-icx" ] ; then
+   echo "The NCEPlibs cannot compile with intel-icx, so using intel icc compile instead only for NCEPlibs"
+   compiler="intel"
+fi
+
+echo $compiler
 # set up some default variables if not called from COMPILE
 # NCEP_DIR is set if this script is called from the COMPILE script
 # EXTERNAL_LIBS is set if using external location for storage of nceplibs
