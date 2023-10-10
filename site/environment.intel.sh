@@ -37,14 +37,13 @@ case $hostname in
       module rm intel-oneapi
       module rm intel
       module rm gcc
-      module load python/3.9
-      module load cmake/3.23.1
-      module load libyaml/0.2.5
       module load intel-classic/2022.2.1
       module unload cray-libsci
       module load cray-hdf5
       module load cray-netcdf
       module load craype-hugepages4M
+      module load cmake/3.23.1
+      module load libyaml/0.2.5
 
       # Add -DHAVE_GETTID to the FMS cppDefs
       export FMS_CPPDEFS=-DHAVE_GETTID
@@ -72,13 +71,12 @@ case $hostname in
       module rm intel-oneapi
       module rm intel
       module rm gcc
-      module load python/3.9
-      module load cmake/3.20.1
-      module load libyaml/0.2.5
       module load intel-classic/2022.0.2
       module load cray-hdf5/1.12.1.3
       module load cray-netcdf/4.8.1.3
       module load craype-hugepages4M
+      module load cmake/3.20.1
+      module load libyaml/0.2.5
 
       # Add -DHAVE_GETTID to the FMS cppDefs
       export FMS_CPPDEFS=-DHAVE_GETTID
