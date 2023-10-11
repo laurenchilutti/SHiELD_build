@@ -46,7 +46,7 @@ git clone -b ${drivers_release}   https://github.com/NOAA-GFDL/atmos_drivers
 git clone -q --recursive -b 2023.01 https://github.com/NOAA-GFDL/ocean_BGC.git
 git clone -b dev/gfdl https://github.com/NOAA-GFDL/MOM6-examples.git mom6
 pushd mom6
-git checkout a362c18
+git checkout 3220014e
 git submodule update --recursive --init src/MOM6 src/SIS2 src/icebergs
 popd
 
