@@ -42,8 +42,8 @@ else
   LIBS += -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz
 endif
 
-LIBS += -lSerialboxFortran -lSerialboxC -lSerialboxCore -lpthread -lstdc++ -lstdc++fs
-INCLUDE += -I$(SERIALBOX_ROOT)/include
+#LIBS += -lSerialboxFortran -lSerialboxC -lSerialboxCore -lpthread -lstdc++ -lstdc++fs
+#INCLUDE += -I$(SERIALBOX_ROOT)/include
 
 INCLUDE += $(shell pkg-config --cflags yaml-0.1)
 FPPFLAGS := -fpp -Wp,-w $(INCLUDE)

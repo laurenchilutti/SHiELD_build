@@ -38,7 +38,7 @@ serial_coupler="serializer"
 
 fv3_release=$serialize_dycore
 phy_release=$serialize_physics
-fms_release="2023.04"
+fms_release="2024.02"
 coupler_release=$serial_coupler
 drivers_release=$release
 

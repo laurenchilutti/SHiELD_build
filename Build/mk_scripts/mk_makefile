@@ -115,7 +115,7 @@ if [ ${CONFIG} = 'shield' ] ; then
            -p libgfs.a ${BUILD_ROOT}/Build/exec/${CONFIG}_${HYDRO}.${COMP}.${BIT}.${COMPILER}/pathnames_gfs ${SERIAL_L_FLAGS}
 
   mkmf -m Makefile_fv3 -a ${SHiELD_SRC} -t "${BUILD_ROOT}/${TEMPLATE}" ${SERIAL_I_FLAGS} -c "${FV3_cppDefs}" \
-         -p test.x -o "-I${SHiELD_SRC}/FMS/include -I${NCEP_DIR}/libFMS/${COMPILER}/${BIT}" \
+         -p libfv3.a -o "-I${SHiELD_SRC}/FMS/include -I${NCEP_DIR}/libFMS/${COMPILER}/${BIT}" \
           ${BUILD_ROOT}/Build/exec/${CONFIG}_${HYDRO}.${COMP}.${BIT}.${COMPILER}/pathnames_fv3 ${SERIAL_L_FLAGS}
 
   mkmf -m Makefile_driver -a ${SHiELD_SRC} -t "${BUILD_ROOT}/${TEMPLATE}" -c "${FV3_cppDefs}" \
