@@ -50,7 +50,7 @@ set CASE = "C$res"
 set EXE = "x"
 
 # directory structure
-set WORKDIR    = ${BASEDIR}/SHiELD_${RELEASE}/${NAME}.${CASE}.${TYPE}.${COMP}.${MODE}.${COMPILER}.${MONO}.${MEMO}_1hr/
+set WORKDIR    = ${BASEDIR}/SHiELD_${RELEASE}/${NAME}.${CASE}.${TYPE}.${COMP}.${MODE}.${COMPILER}.${MONO}.${MEMO}_1hr_layoutchg/
 set executable = ${BUILD_AREA}/Build/bin/SHiELD_${TYPE}.${COMP}.${MODE}.${COMPILER}.${EXE}
 
 # sending file to gfdl
@@ -72,8 +72,8 @@ set GRIDDIR = ${INPUT_DATA}/global.v201810/${CASE}/GRID/ #CHECK
     set npx = "49"
     set npy = "49"
     set npz = "79"
-    set layout_x = "2"
-    set layout_y = "8"
+    set layout_x = "4"
+    set layout_y = "4"
     set io_layout = "1,1"
     set nthreads = "4"
 
