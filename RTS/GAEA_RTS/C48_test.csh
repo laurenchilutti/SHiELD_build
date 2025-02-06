@@ -1,6 +1,6 @@
 #!/bin/tcsh
 #SBATCH --output=./stdout/%x.%j
-#SBATCH --job-name=C48_test
+#SBATCH --job-name=C48_test_container
 #SBATCH --clusters=c5
 #SBATCH --time=00:10:00
 #SBATCH --nodes=2
@@ -19,9 +19,16 @@ if ( ! $?COMPILER ) then
   set COMPILER = "intel"
 endif
 
-set RELEASE = "`cat ${BUILD_AREA}/../SHiELD_SRC/release`"
-
-source ${BUILD_AREA}/site/environment.${COMPILER}.csh
+#set RELEASE = "`cat ${BUILD_AREA}/../SHiELD_SRC/release`"
+set RELEASE = "container"
+#source ${BUILD_AREA}/site/environment.${COMPILER}.csh
+module load cray-mpich-abi
+setenv MPICH_SMP_SINGLE_COPY_MODE "NONE"
+module unload cray-hdf5
+setenv APPTAINERENV_LD_LIBRARY_PATH ${CRAY_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}:/opt/cray/pe/lib64:/usr/lib64/libibverbs:/opt/cray/libfabric/1.20.1/lib64:/opt/cray/pals/1.4/lib:\${LD_LIBRARY_PATH}
+#setenv APPTAINERENV_LD_LIBRARY_PATH "${CRAY_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}:/opt/cray/pe/lib64:/usr/lib64/libibverbs:/opt/cray/libfabric/1.20.1/lib64:/opt/cray/pals/1.4/lib"
+setenv APPTAINER_CONTAINLIBS "/usr/lib64/libjansson.so.4,/usr/lib64/libjson-c.so.3,/usr/lib64/libdrm.so.2,/lib64/libtinfo.so.6,/usr/lib64/libnl-3.so.200,/usr/lib64/librdmacm.so.1,/usr/lib64/libibverbs.so.1,/usr/lib64/libibverbs/libmlx5-rdmav34.so,/usr/lib64/libnuma.so.1,/usr/lib64/libnl-cli-3.so.200,/usr/lib64/libnl-genl-3.so.200,/usr/lib64/libnl-nf-3.so.200,/usr/lib64/libnl-route-3.so.200,/usr/lib64/libnl-3.so.200,/usr/lib64/libnl-idiag-3.so.200,/usr/lib64/libnl-xfrm-3.so.200,/usr/lib64/libnl-genl-3.so.200"
+setenv APPTAINER_BIND "/usr/share/libdrm,/var/spool/slurmd,/opt/cray,/opt/intel,${PWD},/etc/libibverbs.d,/usr/lib64/libibverbs,/usr/lib64/libnl3-200,${HOME}"
 
 #set hires_oro_factor = 3
 set res = 48
@@ -38,7 +45,7 @@ set MEMO = "$SLURM_JOB_NAME"
 set EXE = "x"
 set HYPT = "on"         # choices:  on, off  (controls hyperthreading)
 if ( ! $?COMP ) then
-  set COMP = "repro"       # choices:  debug, repro, prod
+  set COMP = "prod"       # choices:  debug, repro, prod
 endif
 set NO_SEND = "no_send"    # choices:  send, no_send
 set RESTART_RUN = "F"
@@ -160,7 +167,7 @@ set TIME_STAMP = ${BUILD_AREA}/site/time_stamp.csh
 # when running with threads, need to use the following command
     @ npes = ${layout_x} * ${layout_y} * 6
     @ skip = ${nthreads} / ${div}
-    set run_cmd = "srun --ntasks=$npes --cpus-per-task=$skip ./$executable:t"
+    set run_cmd = "srun --ntasks=$npes --cpus-per-task=$skip apptainer exec --writable-tmpfs /gpfs/f5/gfdl_f/proj-shared/Thomas.Robinson/shield-ubuntu20.04-intel2024.sif /SHiELD_build/Build/bin/$executable:t"
 
     setenv SLURM_CPU_BIND verbose
   
