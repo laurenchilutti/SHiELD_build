@@ -1,0 +1,501 @@
+diag_files:
+- file_name: grid_spec
+  time_units: days
+  unlimdim: time
+  freq: -1 months
+  varlist:
+  - module: dynamics
+    var_name: grid_lon
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: grid_lat
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: area
+    reduction: none
+    kind: r4
+- file_name: atmos_4xdaily
+  time_units: days
+  unlimdim: time
+  freq: 6 hours
+  varlist:
+  - module: dynamics
+    var_name: slp
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: vort850
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: vort200
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: us
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: u1000
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: u850
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: u700
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: u500
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: u200
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: u100
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: u50
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: vs
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: v1000
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: v850
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: v700
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: v500
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: v200
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: v100
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: tm
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: t1000
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: t850
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: t700
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: t500
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: t200
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: t100
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: t50
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: z1000
+    output_name: h1000
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: z850
+    output_name: h850
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: z700
+    output_name: h700
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: z500
+    output_name: h500
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: z200
+    output_name: h200
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: z100
+    output_name: h100
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: w500
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: w200
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: q1000
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: q850
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: q700
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: q500
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: rh1000
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: rh850
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: rh700
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: rh500
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: omg1000
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: omg850
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: omg700
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: omg500
+    reduction: none
+    kind: r4
+- file_name: atmos_daily
+  time_units: days
+  unlimdim: time
+  freq: 24 hours
+  varlist:
+  - module: dynamics
+    var_name: u850
+    reduction: average
+    kind: r4
+  - module: dynamics
+    var_name: v850
+    reduction: average
+    kind: r4
+  - module: dynamics
+    var_name: u200
+    reduction: average
+    kind: r4
+  - module: dynamics
+    var_name: v200
+    reduction: average
+    kind: r4
+  - module: dynamics
+    var_name: t200
+    reduction: average
+    kind: r4
+  - module: dynamics
+    var_name: t100
+    reduction: average
+    kind: r4
+  - module: dynamics
+    var_name: slp
+    reduction: average
+    kind: r4
+- file_name: atmos_static
+  time_units: hours
+  unlimdim: time
+  freq: -1 hours
+  varlist:
+  - module: dynamics
+    var_name: pk
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: bk
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: hyam
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: hybm
+    reduction: none
+    kind: r4
+  - module: dynamics
+    var_name: zsurf
+    reduction: none
+    kind: r4
+- file_name: atmos_sos
+  time_units: days
+  unlimdim: time
+  freq: 60 minutes
+  varlist:
+  - module: dynamics
+    var_name: tq
+    reduction: none
+    kind: r4
+- file_name: nggps2d
+  time_units: hours
+  unlimdim: time
+  freq: 0 hours
+  varlist:
+  - module: gfs_phys
+    var_name: ALBDOsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: cnvprcp
+    output_name: CPRATsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: totprcp
+    output_name: PRATEsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: DLWRFsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: ULWRFsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: DSWRFsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: USWRFsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: DSWRFtoa
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: USWRFtoa
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: ULWRFtoa
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: gflux
+    output_name: GFLUXsfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: HGTsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: hpbl
+    output_name: HPBLsfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: fice
+    output_name: ICECsfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SLMSKsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: dqsfc
+    output_name: LHTFLsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: dtsfc
+    output_name: SHTFLsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: psurf
+    output_name: PRESsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: pwat
+    output_name: PWATclm
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: soilm
+    output_name: SOILM
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SOILW1
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SOILW2
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SOILW3
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SOILW4
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: q2m
+    output_name: SPFH2m
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: TCDCclm
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: TCDChcl
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: TCDClcl
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: TCDCmcl
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SOILT1
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SOILT2
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SOILT3
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: SOILT4
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: t2m
+    output_name: TMP2m
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: tsfc
+    output_name: TMPsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: dugwd
+    output_name: UGWDsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: dvgwd
+    output_name: VGWDsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: dusfc
+    output_name: UFLXsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: dvsfc
+    output_name: VFLXsfc
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: u10m
+    output_name: UGRD10m
+    reduction: none
+    kind: r4
+  - module: gfs_phys
+    var_name: v10m
+    output_name: VGRD10m
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: weasd
+    output_name: WEASDsfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: snowd
+    output_name: SNODsfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: ZORLsfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: VFRACsfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: f10m
+    output_name: F10Msfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: vtype
+    output_name: VTYPEsfc
+    reduction: none
+    kind: r4
+  - module: gfs_sfc
+    var_name: stype
+    output_name: STYPEsfc
+    reduction: none
+    kind: r4
