@@ -242,13 +242,14 @@ ls RESTART/
 
 # copy over the other tables and executable
 if ( ${use_yaml} == ".T." ) then
-  cp ${BUILD_AREA}/tables/data_table.yaml data_table.yaml
+#  cp ${BUILD_AREA}/tables/data_table.yaml data_table.yaml
   cp ${BUILD_AREA}/tables/field_table_6species_tke.yaml field_table.yaml
+  cp ${BUILD_AREA}/tables/diag_table_no3d.yaml .
 else
   cp ${BUILD_AREA}/tables/data_table data_table
   cp ${BUILD_AREA}/tables/field_table_6species_tke field_table
+  cp ${BUILD_AREA}/tables/diag_table_no3d .
 endif
-cp ${BUILD_AREA}/tables/diag_table_no3d diag_table
 cp $executable .
 
 # GFS standard input data
@@ -266,10 +267,19 @@ set echo
 set curr_date = "${y},${m},${d},${h},0,0"
 
 # build the diag_table with the experiment name and date stamp
-cat >! diag_table << EOF
+cat >! diag.title.yaml << EOF
+title: ${DATE}.${GRID}.${MODE}
+base_date: $y $m $d $h 0 0
+EOF
+cat >! diag.title << EOF
 ${DATE}.${GRID}.${MODE}
 $y $m $d $h 0 0 
 EOF
+if ( ${use_yaml} == ".T." ) then
+  cat diag.title.yaml diag_table_no3d.yaml > diag_table.yaml
+else
+  cat diag.title diag_table_no3d > diag_table
+endif
 
 rm -f $WORKDIR/rundir/INPUT/gk03_CF0.nc
 cp $FIXDIR/global_sfc_emissivity_idx.txt INPUT/sfc_emissivity_idx.txt
@@ -561,6 +571,7 @@ cat >! input.nml <<EOF
 /
 
  &diag_manager_nml
+       use_modern_diag = $use_yaml
        prepend_date = .F.
 /
 
