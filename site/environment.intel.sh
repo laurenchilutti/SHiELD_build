@@ -43,7 +43,7 @@ case $hostname in
       module load cray-hdf5
       module load cray-netcdf
       module load craype-hugepages4M
-      #module load cmake/3.23.1
+      #module load cmake/3.27.9
       #module load libyaml/0.2.5
 
       # Add -DHAVE_GETTID to the FMS cppDefs
@@ -75,10 +75,10 @@ case $hostname in
       module rm gcc
       module load intel-classic/2023.2.0
       module unload cray-libsci
-      module load cray-hdf5/1.12.2.11
-      module load cray-netcdf/4.9.0.11
+      module load cray-hdf5/1.14.3.5
+      module load cray-netcdf/4.9.0.17
       module load craype-hugepages4M
-      module load cmake/3.23.1
+      module load cmake/3.27.9
       module load libyaml/0.2.5
 
       # Add -DHAVE_GETTID to the FMS cppDefs
@@ -185,12 +185,13 @@ case $hostname in
       echo " lsc environment "
 
       source $MODULESHOME/init/sh
-      module load oneapi/2023.0
-      module load compiler/2023.0.0
-      module load mpi/2021.8.0
-      module load netcdf/4.9.0
-      module load hdf5/1.12.0
-      module load cmake/3.18.2
+      module load oneapi/2024.2
+      module load compiler/2024.2.0
+      module load mpi/2021.13
+      module load netcdf/4.9.2
+      module load hdf5/1.14.5
+      module load cmake/3.30.0
+      module load libyaml/0.2.5
 
       export CPATH="${NETCDF_ROOT}/include:${CPATH}"
       export NETCDF_DIR=${NETCDF_ROOT}
@@ -198,7 +199,7 @@ case $hostname in
 
       # make your compiler selections here
       export FC=mpiifort
-      export CC=mpiicc
+      export CC=mpiicx
       export CXX=mpicpc
       export LD=mpiifort
       export TEMPLATE=site/intel.mk
