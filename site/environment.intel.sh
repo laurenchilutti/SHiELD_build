@@ -76,7 +76,7 @@ case $hostname in
       module rm intel-oneapi
       module rm intel
       module rm gcc
-      module load intel-classic/2023.2.0
+      module load intel-oneapi/2025.0
       module unload cray-libsci
       module load cray-hdf5/1.12.2.11
       module load cray-netcdf/4.9.0.9

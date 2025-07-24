@@ -14,6 +14,7 @@
 DEBUG =
 REPRO =
 VERBOSE =
+USE_LTO =            # Enable link-time optimization
 OPENMP =
 PIC =
 
@@ -76,6 +77,7 @@ FFLAGS_DEBUG = -g -O0 -debug -check -check noarg_temp_created -check nopointer -
 TRANSCENDENTALS := -fast-transcendentals
 FFLAGS_OPENMP = -qopenmp
 FFLAGS_VERBOSE = -v -V -what
+FFLAGS_LTO = -flto
 
 CFLAGS := -D__IFC -sox -msse2
 ifeq ($(AVX2),Y)
@@ -86,13 +88,14 @@ CFLAGS_OPT = -O2 -debug minimal
 CFLAGS_REPRO = -O2 -debug minimal
 CFLAGS_OPENMP = -qopenmp
 CFLAGS_DEBUG = -O0 -g -ftrapuv -traceback
+CFLAGS_LTO = -flto
 
 # Optional Testing compile flags.  Mutually exclusive from DEBUG, REPRO, and OPT
 # *_TEST will match the production if no new option(s) is(are) to be tested.
 FFLAGS_TEST = -O3 -debug minimal -fp-model source -qoverride-limits
 CFLAGS_TEST = -O2
 
-LDFLAGS :=
+LDFLAGS := -fuse-ld=lld
 LDFLAGS_OPENMP := -qopenmp
 LDFLAGS_VERBOSE := -Wl,-V,--verbose,-cref,-M
 
@@ -124,6 +127,12 @@ ifneq ($(VERBOSE),)
 CFLAGS += $(CFLAGS_VERBOSE)
 FFLAGS += $(FFLAGS_VERBOSE)
 LDFLAGS += $(LDFLAGS_VERBOSE)
+endif
+
+ifneq ($(USE_LTO),)
+CFLAGS += $(CFLAGS_LTO)
+FFLAGS += $(FFLAGS_LTO)
+LDFLAGS += $(FFLAGS)
 endif
 
 ifeq ($(NETCDF),3)

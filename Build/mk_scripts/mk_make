@@ -106,12 +106,12 @@ elif [ ${CONFIG} = 'shiemom'  ] ; then
 fi
 
 if [ ${CONFIG} = 'shield' ] || [ ${CONFIG} = 'shiemom' ]  ; then
-  (cd exec/${CONFIG}_${HYDRO}.${comp}.${bit}.${COMPILER} ; make -j 8 OPENMP=Y ${COMP} AVX=${AVX} PIC=${PIC} -f Makefile_gfs)
+  (cd exec/${CONFIG}_${HYDRO}.${comp}.${bit}.${COMPILER} ; make -j 8 OPENMP=Y ${COMP} AVX=${AVX} PIC=${PIC} USE_LTO=Y -f Makefile_gfs)
 fi
 
-(cd exec/${CONFIG}_${HYDRO}.${comp}.${bit}.${COMPILER} ; make -j 8 OPENMP=Y NETCDF=3 ${COMP} AVX=${AVX} ${BIT} PIC=${PIC} EXTERNALLIBS="${EXTERNALLIBS}" -f Makefile_fv3)
+(cd exec/${CONFIG}_${HYDRO}.${comp}.${bit}.${COMPILER} ; make -j 8 OPENMP=Y NETCDF=3 ${COMP} AVX=${AVX} ${BIT} PIC=${PIC} USE_LTO=Y  EXTERNALLIBS="${EXTERNALLIBS}" -f Makefile_fv3)
 
 if   [ ${CONFIG} = 'shield' ] || [ ${CONFIG} = 'shiemom' ] ; then
-   (cd exec/${CONFIG}_${HYDRO}.${comp}.${bit}.${COMPILER} ; make -j 8 OPENMP=Y NETCDF=3 ${COMP} AVX=${AVX} PIC=${PIC} EXTERNALLIBS="${EXTERNALLIBS}" -f Makefile_driver)
+   (cd exec/${CONFIG}_${HYDRO}.${comp}.${bit}.${COMPILER} ; make -j 8 OPENMP=Y NETCDF=3 ${COMP} AVX=${AVX} PIC=${PIC} USE_LTO=Y EXTERNALLIBS="${EXTERNALLIBS}" -f Makefile_driver)
 fi
 exit 0
