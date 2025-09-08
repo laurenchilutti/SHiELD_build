@@ -27,6 +27,33 @@
 set hostname=`hostname`
 
 switch ($hostname)
+   case t6n*:
+   case t5n*:
+   case gaea60:
+      echo " gaea t5/t6 environment "
+
+      source ${MODULESHOME}/init/csh
+      module unload PrgEnv-pgi PrgEnv-intel PrgEnv-gnu
+      module unload darshan-runtime
+      module load   PrgEnv-intel
+      module rm intel-classic
+      module rm intel-oneapi
+      module rm intel
+      module rm gcc
+      module load intel-classic/2023.2.0
+      module unload cray-libsci
+      module load cray-hdf5/1.12.2.11
+      module load cray-netcdf/4.9.0.9
+      module load craype-hugepages4M
+      #module load cmake/3.23.1
+      #module load libyaml/0.2.5
+
+      setenv LAUNCHER "srun"
+      setenv LD_LIBRARY_PATH ${CRAY_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}
+
+      echo -e ' '
+      module list
+      breaksw
    case gaea6?:
    case c6n*:
       echo " gaea C6 environment "

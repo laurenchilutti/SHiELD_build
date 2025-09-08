@@ -27,6 +27,44 @@
 hostname=`hostname`
 
 case $hostname in
+   gaea60 | t6n* | t5n* )
+      echo " gaea t5/t6 environment "
+
+      . ${MODULESHOME}/init/sh
+      module unload PrgEnv-pgi PrgEnv-intel PrgEnv-gnu
+      module unload darshan-runtime
+      module load   PrgEnv-intel
+      module rm intel-classic
+      module rm intel-oneapi
+      module rm intel
+      module rm gcc
+      module load intel-classic/2023.2.0
+      module unload cray-libsci
+      module load cray-hdf5/1.12.2.11
+      module load cray-netcdf/4.9.0.9
+      module load craype-hugepages4M
+      #module load cmake/3.27.9
+      #module load libyaml/0.2.5
+
+      # Add -DHAVE_GETTID to the FMS cppDefs
+      export FMS_CPPDEFS=-DHAVE_GETTID
+
+      # make your compiler selections here
+      export FC=ftn
+      export CC=cc
+      export CXX=CC
+      export LD=ftn
+      export TEMPLATE=site/intel.mk
+      export LAUNCHER=srun
+
+      #need to add this for dynamically linking on GAEA
+      export LD_LIBRARY_PATH=${CRAY_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH}
+
+      # highest level of AVX support
+      export AVX_LEVEL=-march=core-avx-i
+      echo -e ' '
+      module list
+      ;;
    gaea6? | c6n* )
       echo " gaea C6 environment "
 
